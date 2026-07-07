@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HR Quiz Game</title>
+<style>
+:root {
+  --primary: #4f46e5;
+  --primary-dark: #3730a3;
+  --correct: #16a34a;
+  --incorrect: #dc2626;
+  --bg: #f4f5fb;
+  --card: #ffffff;
+  --text: #1f2330;
+  --muted: #6b7280;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: linear-gradient(135deg, #eef0fb 0%, #f9f5ff 100%);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.app {
+  width: 100%;
+  max-width: 640px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 20px;
+  box-shadow: 0 20px 45px rgba(79, 70, 229, 0.15);
+  padding: 40px;
+  text-align: center;
+}
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+  color: var(--primary-dark);
+}
+
+.subtitle {
+  color: var(--muted);
+  margin-bottom: 32px;
+  font-size: 15px;
+}
+
+.btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  font-size: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.btn:hover { background: var(--primary-dark); }
+.btn:active { transform: scale(0.97); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.btn-secondary:hover { background: #eef0fd; }
+
+.progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.progress-label {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.question-text {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.option {
+  text-align: left;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  background: #fafafe;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--text);
+}
+
+.option:hover:not(.disabled) {
+  border-color: var(--primary);
+  background: #f0f0ff;
+}
+
+.option.selected {
+  border-color: var(--primary);
+  background: #eef0fd;
+}
+
+.option.correct {
+  border-color: var(--correct);
+  background: #e9f9ee;
+  color: #14532d;
+  font-weight: 600;
+}
+
+.option.incorrect {
+  border-color: var(--incorrect);
+  background: #fdecec;
+  color: #7f1d1d;
+  font-weight: 600;
+}
+
+.option.disabled { cursor: default; }
+
+.next-wrap {
+  margin-top: 24px;
+  min-height: 48px;
+}
+
+.score-circle {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 8px solid var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 0 auto 24px auto;
+}
+
+.score-circle .score-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.score-circle .score-max {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.score-message {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.score-detail {
+  color: var(--muted);
+  margin-bottom: 28px;
+  font-size: 14px;
+}
+
+.review-list {
+  text-align: left;
+  margin: 24px 0;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.review-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.review-item:last-child { border-bottom: none; }
+
+.review-q { font-weight: 600; margin-bottom: 4px; }
+
+.review-answer.correct { color: var(--correct); }
+.review-answer.incorrect { color: var(--incorrect); }
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.form-fields {
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+.field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+  margin-top: 16px;
+}
+
+.field-label:first-child { margin-top: 0; }
+
+.text-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 2px solid #e5e7eb;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--text);
+  background: #fafafe;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-error {
+  color: var(--incorrect);
+  font-size: 13px;
+  margin-top: 12px;
+  min-height: 16px;
+}
+
+.participant-summary {
+  text-align: left;
+  background: #f5f5fc;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.participant-summary div { margin-bottom: 4px; }
+.participant-summary div:last-child { margin-bottom: 0; }
+.participant-summary strong { color: var(--muted); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="card">
+
+    <div id="start-screen" class="screen active">
+      <h1>HR Quiz Game</h1>
+      <p class="subtitle">Test your HR knowledge — 5 questions, scored out of 10.</p>
+      <div class="form-fields">
+        <label class="field-label" for="participant-name">Name</label>
+        <input type="text" id="participant-name" class="text-input" placeholder="Enter your name">
+
+        <label class="field-label" for="participant-role">Job Title</label>
+        <input type="text" id="participant-role" class="text-input" placeholder="Enter your job title">
+
+        <label class="field-label" for="test-date">Date of Test</label>
+        <input type="date" id="test-date" class="text-input">
+
+        <div id="form-error" class="form-error"></div>
+      </div>
+      <button id="start-btn" class="btn">Start Game</button>
+    </div>
+
+    <div id="game-screen" class="screen">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        <span id="progress-label" class="progress-label"></span>
+      </div>
+      <div id="question-text" class="question-text"></div>
+      <div id="options" class="options"></div>
+      <div id="next-wrap" class="next-wrap"></div>
+    </div>
+
+    <div id="result-screen" class="screen">
+      <h1>Game Over</h1>
+      <div class="score-circle">
+        <div class="score-value" id="score-value">0</div>
+        <div class="score-max">out of 10</div>
+      </div>
+      <div class="score-message" id="score-message"></div>
+      <div class="score-detail" id="score-detail"></div>
+      <div class="participant-summary" id="participant-summary"></div>
+      <div class="review-list" id="review-list"></div>
+      <div class="actions">
+        <button id="play-again-btn" class="btn">Play Again</button>
+        <button id="back-to-start-btn" class="btn btn-secondary">Back to Start</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// HR Quiz Game — question bank
+// Each question has 4 options; `answer` is the index (0-3) of the correct option.
+const QUESTION_BANK = [
+  {
+    question: "What does 'HR' primarily stand for in a business context?",
+    options: ["Human Relations", "Human Resources", "Hiring Requirements", "Human Retention"],
+    answer: 1
+  },
+  {
+    question: "What is the main purpose of an onboarding program?",
+    options: [
+      "To evaluate an employee for termination",
+      "To help new hires integrate into the company and become productive quickly",
+      "To negotiate salary after hiring",
+      "To conduct exit interviews"
+    ],
+    answer: 1
+  },
+  {
+    question: "Which of these is typically part of a total compensation package?",
+    options: ["Base salary only", "Base salary, bonus, and benefits", "Only stock options", "Only overtime pay"],
+    answer: 1
+  },
+  {
+    question: "What is 'employee attrition'?",
+    options: [
+      "The rate at which new employees are hired",
+      "The gradual reduction of staff through resignation, retirement, or termination",
+      "The process of promoting employees",
+      "A type of performance bonus"
+    ],
+    answer: 1
+  },
+  {
+    question: "What is the purpose of a performance appraisal?",
+    options: [
+      "To assess and document an employee's job performance over a period",
+      "To recruit new candidates",
+      "To calculate company revenue",
+      "To plan office events"
+    ],
+    answer: 0
+  },
+  {
+    question: "What does 'DEI' stand for in HR practice?",
+    options: [
+      "Development, Efficiency, Innovation",
+      "Diversity, Equity, and Inclusion",
+      "Duties, Ethics, Integrity",
+      "Data, Evaluation, Improvement"
+    ],
+    answer: 1
+  },
+  {
+    question: "What is a 'probation period' in employment?",
+    options: [
+      "A mandatory vacation period",
+      "A trial period at the start of employment to assess employee fit and performance",
+      "A period of unpaid leave",
+      "The final notice period before retirement"
+    ],
+    answer: 1
+  },
+  {
+    question: "Which document typically outlines a company's rules, benefits, and expectations for employees?",
+    options: ["Employee Handbook", "Balance Sheet", "Marketing Plan", "Invoice"],
+    answer: 0
+  },
+  {
+    question: "What is 'succession planning'?",
+    options: [
+      "Planning company holiday parties",
+      "Identifying and developing employees to fill key leadership roles in the future",
+      "Scheduling employee shifts",
+      "Filing tax documents"
+    ],
+    answer: 1
+  },
+  {
+    question: "What is the primary goal of a 360-degree feedback process?",
+    options: [
+      "To gather feedback about an employee from multiple sources (manager, peers, subordinates, self)",
+      "To review only the CEO's performance",
+      "To assess customer satisfaction",
+      "To calculate payroll taxes"
+    ],
+    answer: 0
+  },
+  {
+    question: "What does 'FMLA' (in a US HR context) generally relate to?",
+    options: [
+      "Foreign Market Labor Agreements",
+      "Family and Medical Leave Act, protecting job-protected leave for family/medical reasons",
+      "Financial Management Leadership Award",
+      "Full-time Mandatory Leave Allowance"
+    ],
+    answer: 1
+  },
+  {
+    question: "What is 'employee engagement'?",
+    options: [
+      "The legal contract between employer and employee",
+      "The emotional commitment and enthusiasm an employee has toward their work and organization",
+      "The onboarding paperwork process",
+      "A type of disciplinary action"
+    ],
+    answer: 1
+  },
+  {
+    question: "What is the purpose of an exit interview?",
+    options: [
+      "To offer the departing employee a new role",
+      "To gather feedback and reasons behind an employee's departure",
+      "To finalize the hiring of a replacement",
+      "To conduct a background check"
+    ],
+    answer: 1
+  },
+  {
+    question: "Which of the following best describes 'workplace diversity'?",
+    options: [
+      "Having employees with varied backgrounds, experiences, and perspectives",
+      "Having employees who all share the same skill set",
+      "A company's product range",
+      "The number of office locations a company has"
+    ],
+    answer: 0
+  },
+  {
+    question: "What is a 'grievance procedure' in HR?",
+    options: [
+      "A formal process for employees to raise and resolve workplace complaints",
+      "A performance bonus scheme",
+      "A recruitment strategy",
+      "A payroll calculation method"
+    ],
+    answer: 0
+  },
+  {
+    question: "What does 'talent acquisition' primarily focus on?",
+    options: [
+      "Employee termination processes",
+      "Sourcing, attracting, and hiring skilled candidates to meet organizational needs",
+      "Managing employee payroll",
+      "Office facility management"
+    ],
+    answer: 1
+  },
+  {
+    question: "What is 'employer branding'?",
+    options: [
+      "The company's logo design",
+      "How an organization promotes itself as an employer of choice to attract talent",
+      "A legal contract for new hires",
+      "The pricing strategy for products"
+    ],
+    answer: 1
+  },
+  {
+    question: "What is the purpose of a Job Description (JD)?",
+    options: [
+      "To outline a role's responsibilities, requirements, and expectations",
+      "To record employee attendance",
+      "To calculate employee salary increments",
+      "To document customer complaints"
+    ],
+    answer: 0
+  },
+  {
+    question: "What is 'constructive feedback'?",
+    options: [
+      "Feedback intended to criticize without offering solutions",
+      "Feedback that is specific, actionable, and aimed at helping someone improve",
+      "Feedback given only during annual reviews",
+      "Feedback that is anonymous and untraceable"
+    ],
+    answer: 1
+  },
+  {
+    question: "What does 'work-life balance' refer to?",
+    options: [
+      "Working overtime every day",
+      "A healthy equilibrium between professional responsibilities and personal life",
+      "A company's financial balance sheet",
+      "The ratio of managers to employees"
+    ],
+    answer: 1
+  },
+  {
+    question: "What is 'employee retention'?",
+    options: [
+      "The process of recruiting new hires",
+      "An organization's ability to keep its employees and reduce turnover",
+      "The process of terminating underperforming staff",
+      "A type of employee training program"
+    ],
+    answer: 1
+  },
+  {
+    question: "What is the main purpose of conducting a training needs analysis?",
+    options: [
+      "To identify gaps in employee skills and determine what training is required",
+      "To set employee salaries",
+      "To schedule company holidays",
+      "To design office layouts"
+    ],
+    answer: 0
+  },
+  {
+    question: "What is 'compensation benchmarking'?",
+    options: [
+      "Comparing a company's pay structure with industry standards to stay competitive",
+      "Setting a fixed salary for all employees regardless of role",
+      "A method of tracking employee attendance",
+      "A performance review technique"
+    ],
+    answer: 0
+  },
+  {
+    question: "What best defines 'organizational culture'?",
+    options: [
+      "The physical office building design",
+      "The shared values, beliefs, and behaviors that shape how work gets done in a company",
+      "The company's annual revenue",
+      "The list of company shareholders"
+    ],
+    answer: 1
+  },
+  {
+    question: "What is the purpose of 'conflict resolution' in the workplace?",
+    options: [
+      "To avoid all disagreements permanently",
+      "To address and resolve disputes between employees in a fair and constructive way",
+      "To terminate employees who disagree",
+      "To reduce employee salaries"
+    ],
+    answer: 1
+  },
+  {
+    question: "What does 'reasonable accommodation' typically refer to in HR?",
+    options: [
+      "Free lunch for all employees",
+      "Adjustments made to help employees with disabilities perform their job effectively",
+      "A discount on company products",
+      "Extra vacation days for senior staff"
+    ],
+    answer: 1
+  },
+  {
+    question: "What is the goal of a 'mentorship program' at work?",
+    options: [
+      "To pair experienced employees with less experienced ones for guidance and growth",
+      "To evaluate salaries",
+      "To manage employee complaints",
+      "To handle company finances"
+    ],
+    answer: 0
+  }
+];
+
+const QUESTIONS_PER_GAME = 5;
+const POINTS_PER_QUESTION = 10 / QUESTIONS_PER_GAME; // score is always out of 10
+
+let gameQuestions = [];
+let currentIndex = 0;
+let score = 0;
+let answered = false;
+let reviewLog = [];
+
+const startScreen = document.getElementById("start-screen");
+const gameScreen = document.getElementById("game-screen");
+const resultScreen = document.getElementById("result-screen");
+
+const progressFill = document.getElementById("progress-fill");
+const progressLabel = document.getElementById("progress-label");
+const questionText = document.getElementById("question-text");
+const optionsEl = document.getElementById("options");
+const nextWrap = document.getElementById("next-wrap");
+
+const scoreValueEl = document.getElementById("score-value");
+const scoreMessageEl = document.getElementById("score-message");
+const scoreDetailEl = document.getElementById("score-detail");
+const participantSummaryEl = document.getElementById("participant-summary");
+const reviewListEl = document.getElementById("review-list");
+
+const nameInput = document.getElementById("participant-name");
+const roleInput = document.getElementById("participant-role");
+const dateInput = document.getElementById("test-date");
+const formErrorEl = document.getElementById("form-error");
+
+let participant = { name: "", role: "", date: "" };
+
+const today = new Date();
+dateInput.value = today.toISOString().split("T")[0];
+
+document.getElementById("start-btn").addEventListener("click", handleStartClick);
+document.getElementById("play-again-btn").addEventListener("click", resetFormAndShowStart);
+document.getElementById("back-to-start-btn").addEventListener("click", resetFormAndShowStart);
+
+function resetFormAndShowStart() {
+  nameInput.value = "";
+  roleInput.value = "";
+  dateInput.value = today.toISOString().split("T")[0];
+  formErrorEl.textContent = "";
+  showScreen(startScreen);
+}
+
+function handleStartClick() {
+  const name = nameInput.value.trim();
+  const role = roleInput.value.trim();
+  const date = dateInput.value;
+
+  if (!name || !role || !date) {
+    formErrorEl.textContent = "Please fill in your name, job title, and date of test.";
+    return;
+  }
+
+  formErrorEl.textContent = "";
+  participant = { name, role, date };
+  startGame();
+}
+
+function shuffle(array) {
+  const arr = array.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function showScreen(screen) {
+  [startScreen, gameScreen, resultScreen].forEach(s => s.classList.remove("active"));
+  screen.classList.add("active");
+}
+
+function startGame() {
+  const pool = shuffle(QUESTION_BANK).slice(0, QUESTIONS_PER_GAME);
+
+  gameQuestions = pool.map(q => {
+    const correctText = q.options[q.answer];
+    const shuffledOptions = shuffle(q.options);
+    return {
+      question: q.question,
+      options: shuffledOptions,
+      answer: shuffledOptions.indexOf(correctText)
+    };
+  });
+
+  currentIndex = 0;
+  score = 0;
+  reviewLog = [];
+
+  showScreen(gameScreen);
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = gameQuestions[currentIndex];
+
+  progressFill.style.width = `${(currentIndex / QUESTIONS_PER_GAME) * 100}%`;
+  progressLabel.textContent = `Question ${currentIndex + 1} of ${QUESTIONS_PER_GAME}`;
+
+  questionText.textContent = q.question;
+  optionsEl.innerHTML = "";
+  nextWrap.innerHTML = "";
+
+  q.options.forEach((optionText, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.textContent = optionText;
+    btn.addEventListener("click", () => selectAnswer(idx));
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+
+  const q = gameQuestions[currentIndex];
+  const isCorrect = idx === q.answer;
+  if (isCorrect) score += POINTS_PER_QUESTION;
+
+  reviewLog.push({
+    question: q.question,
+    chosen: q.options[idx],
+    correctAnswer: q.options[q.answer],
+    isCorrect
+  });
+
+  const optionEls = optionsEl.querySelectorAll(".option");
+  optionEls.forEach((el, i) => {
+    el.classList.add("disabled");
+    if (i === q.answer) el.classList.add("correct");
+    else if (i === idx) el.classList.add("incorrect");
+  });
+
+  const isLast = currentIndex === QUESTIONS_PER_GAME - 1;
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "btn";
+  nextBtn.textContent = isLast ? "See Score" : "Next Question";
+  nextBtn.addEventListener("click", () => {
+    if (isLast) {
+      finishGame();
+    } else {
+      currentIndex++;
+      renderQuestion();
+    }
+  });
+  nextWrap.appendChild(nextBtn);
+}
+
+function finishGame() {
+  progressFill.style.width = "100%";
+  showScreen(resultScreen);
+
+  const finalScore = Math.round(score);
+  scoreValueEl.textContent = finalScore;
+
+  const correctCount = reviewLog.filter(r => r.isCorrect).length;
+  scoreDetailEl.textContent = `You answered ${correctCount} out of ${QUESTIONS_PER_GAME} questions correctly.`;
+
+  let message;
+  if (finalScore === 10) message = "Perfect score! HR expert in the making.";
+  else if (finalScore >= 8) message = "Great job! Strong HR knowledge.";
+  else if (finalScore >= 6) message = "Good effort! A few gaps to brush up on.";
+  else if (finalScore >= 4) message = "Not bad — worth another round.";
+  else message = "Keep learning — HR basics need a refresher.";
+  scoreMessageEl.textContent = message;
+
+  const formattedDate = new Date(participant.date + "T00:00:00").toLocaleDateString(undefined, {
+    year: "numeric", month: "long", day: "numeric"
+  });
+  participantSummaryEl.innerHTML = `
+    <div><strong>Name:</strong> ${participant.name}</div>
+    <div><strong>Job Title:</strong> ${participant.role}</div>
+    <div><strong>Date of Test:</strong> ${formattedDate}</div>
+  `;
+
+  reviewListEl.innerHTML = "";
+  reviewLog.forEach((r, i) => {
+    const item = document.createElement("div");
+    item.className = "review-item";
+    item.innerHTML = `
+      <div class="review-q">${i + 1}. ${r.question}</div>
+      <div class="review-answer ${r.isCorrect ? "correct" : "incorrect"}">
+        Your answer: ${r.chosen} ${r.isCorrect ? "(Correct)" : `(Incorrect — correct answer: ${r.correctAnswer})`}
+      </div>
+    `;
+    reviewListEl.appendChild(item);
+  });
+}
+</script>
+</body>
+</html>
