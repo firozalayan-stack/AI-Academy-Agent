@@ -298,6 +298,12 @@ h1 {
         <label class="field-label" for="participant-role">Job Title</label>
         <input type="text" id="participant-role" class="text-input" placeholder="Enter your job title">
 
+        <label class="field-label" for="participant-phone">Phone Number</label>
+        <input type="tel" id="participant-phone" class="text-input" placeholder="Enter your phone number">
+
+        <label class="field-label" for="participant-email">Email ID</label>
+        <input type="email" id="participant-email" class="text-input" placeholder="Enter your email address">
+
         <label class="field-label" for="test-date">Date of Test</label>
         <input type="date" id="test-date" class="text-input">
 
@@ -623,10 +629,14 @@ const reviewListEl = document.getElementById("review-list");
 
 const nameInput = document.getElementById("participant-name");
 const roleInput = document.getElementById("participant-role");
+const phoneInput = document.getElementById("participant-phone");
+const emailInput = document.getElementById("participant-email");
 const dateInput = document.getElementById("test-date");
 const formErrorEl = document.getElementById("form-error");
 
-let participant = { name: "", role: "", date: "" };
+const RESULTS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz3BBYgB2TvPGolm8DB-G8fGJHyrZUIREWS8OpFnmLUi9yj2PJskxzp91_0YfJJ-YYi6Q/exec";
+
+let participant = { name: "", role: "", phone: "", email: "", date: "" };
 
 const today = new Date();
 dateInput.value = today.toISOString().split("T")[0];
@@ -638,6 +648,8 @@ document.getElementById("back-to-start-btn").addEventListener("click", resetForm
 function resetFormAndShowStart() {
   nameInput.value = "";
   roleInput.value = "";
+  phoneInput.value = "";
+  emailInput.value = "";
   dateInput.value = today.toISOString().split("T")[0];
   formErrorEl.textContent = "";
   showScreen(startScreen);
@@ -646,16 +658,48 @@ function resetFormAndShowStart() {
 function handleStartClick() {
   const name = nameInput.value.trim();
   const role = roleInput.value.trim();
+  const phone = phoneInput.value.trim();
+  const email = emailInput.value.trim();
   const date = dateInput.value;
 
-  if (!name || !role || !date) {
-    formErrorEl.textContent = "Please fill in your name, job title, and date of test.";
+  if (!name || !role || !phone || !email || !date) {
+    formErrorEl.textContent = "Please fill in your name, job title, phone number, email, and date of test.";
+    return;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    formErrorEl.textContent = "Please enter a valid email address.";
+    return;
+  }
+
+  if (!/^[+\d][\d\s\-()]{6,}$/.test(phone)) {
+    formErrorEl.textContent = "Please enter a valid phone number.";
     return;
   }
 
   formErrorEl.textContent = "";
-  participant = { name, role, date };
+  participant = { name, role, phone, email, date };
   startGame();
+}
+
+function submitResult(finalScore, correctCount) {
+  if (!RESULTS_WEBHOOK_URL || RESULTS_WEBHOOK_URL.indexOf("http") !== 0) return;
+  try {
+    fetch(RESULTS_WEBHOOK_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({
+        name: participant.name,
+        role: participant.role,
+        phone: participant.phone,
+        email: participant.email,
+        testDate: participant.date,
+        score: finalScore,
+        correct: correctCount
+      })
+    });
+  } catch (err) { /* logging must never break the game */ }
 }
 
 function shuffle(array) {
@@ -760,6 +804,8 @@ function finishGame() {
   const correctCount = reviewLog.filter(r => r.isCorrect).length;
   scoreDetailEl.textContent = `You answered ${correctCount} out of ${QUESTIONS_PER_GAME} questions correctly.`;
 
+  submitResult(finalScore, correctCount);
+
   let message;
   if (finalScore === 10) message = "Perfect score! HR expert in the making.";
   else if (finalScore >= 8) message = "Great job! Strong HR knowledge.";
@@ -774,6 +820,8 @@ function finishGame() {
   participantSummaryEl.innerHTML = `
     <div><strong>Name:</strong> ${participant.name}</div>
     <div><strong>Job Title:</strong> ${participant.role}</div>
+    <div><strong>Phone:</strong> ${participant.phone}</div>
+    <div><strong>Email:</strong> ${participant.email}</div>
     <div><strong>Date of Test:</strong> ${formattedDate}</div>
   `;
 
