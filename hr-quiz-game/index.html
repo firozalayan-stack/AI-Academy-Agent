@@ -6,8 +6,10 @@
 <title>HR Quiz Game</title>
 <style>
 :root {
-  --primary: #4f46e5;
-  --primary-dark: #3730a3;
+  --primary: #7c3aed;
+  --primary-dark: #5b21b6;
+  --accent: #ec4899;
+  --gold: #fbbf24;
   --correct: #16a34a;
   --incorrect: #dc2626;
   --bg: #f4f5fb;
@@ -22,12 +24,36 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background: linear-gradient(135deg, #eef0fb 0%, #f9f5ff 100%);
+  background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 45%, #831843 100%);
   color: var(--text);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.brand-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: linear-gradient(90deg, #fbbf24, #f472b6, #a78bfa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #f472b6;
+}
+
+.brand-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 4px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 .app {
@@ -38,9 +64,19 @@ body {
 .card {
   background: var(--card);
   border-radius: 20px;
-  box-shadow: 0 20px 45px rgba(79, 70, 229, 0.15);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+  border-top: 5px solid;
+  border-image: linear-gradient(90deg, #fbbf24, #ec4899, #7c3aed) 1;
   padding: 40px;
   text-align: center;
+}
+
+.footer-credit {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.5px;
 }
 
 .screen { display: none; }
@@ -59,7 +95,7 @@ h1 {
 }
 
 .btn {
-  background: var(--primary);
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
   color: white;
   border: none;
   padding: 14px 32px;
@@ -70,13 +106,14 @@ h1 {
   transition: background 0.15s ease, transform 0.1s ease;
 }
 
-.btn:hover { background: var(--primary-dark); }
+.btn:hover { background: linear-gradient(135deg, #6d28d9, #db2777); box-shadow: 0 6px 18px rgba(236, 72, 153, 0.4); }
 .btn:active { transform: scale(0.97); }
 
 .btn-secondary {
-  background: transparent;
+  background: transparent !important;
   color: var(--primary);
   border: 2px solid var(--primary);
+  box-shadow: none !important;
 }
 
 .btn-secondary:hover { background: #eef0fd; }
@@ -98,7 +135,7 @@ h1 {
 
 .progress-fill {
   height: 100%;
-  background: var(--primary);
+  background: linear-gradient(90deg, #fbbf24, #ec4899, #7c3aed);
   border-radius: 999px;
   transition: width 0.3s ease;
 }
@@ -286,6 +323,10 @@ h1 {
 </head>
 <body>
 <div class="app">
+  <div class="brand">
+    <div class="brand-title">World HR Connect &amp; AI Academy</div>
+    <div class="brand-sub">by Nissamudheen Firoz</div>
+  </div>
   <div class="card">
 
     <div id="start-screen" class="screen active">
@@ -339,6 +380,7 @@ h1 {
     </div>
 
   </div>
+  <div class="footer-credit">World HR Connect &amp; AI Academy &middot; by Nissamudheen Firoz</div>
 </div>
 
 <script>
