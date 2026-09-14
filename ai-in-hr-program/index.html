@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI in HR — Practical Certification Program | AI Academy × World HR Connect</title>
+<meta name="description" content="A one-month, hands-on AI certification for HR professionals, facilitated by Nissamudheen Firoz. From Hire to Exit: applying GPTs, AI tools and AI agents across the HR lifecycle." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink-navy:#0B2545;
+    --navy-950:#071B33;
+    --teal:#0FA79E;
+    --teal-bright:#12C1B6;
+    --gold:#B8901F;
+    --paper:#F6F6F3;
+    --paper-raised:#FFFFFF;
+    --ink-body:#232B3B;
+    --ink-muted:#5B6472;
+    --mist:#DEE3EA;
+    --mist-soft:#EEF1F5;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --wrap: 1120px;
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *,*::before,*::after{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+  body{ margin:0; background:var(--paper); color:var(--ink-body); font-family:var(--sans); font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  img,svg{ display:block; max-width:100%; }
+  a{ color:inherit; }
+  button{ font-family:inherit; cursor:pointer; }
+  .wrap{ max-width:var(--wrap); margin:0 auto; padding:0 28px; }
+  h1,h2,h3{ font-family:var(--serif); color:var(--ink-navy); margin:0; font-weight:500; }
+  .nav{ position:sticky; top:0; z-index:50; background:rgba(246,246,243,0.92); backdrop-filter:saturate(140%) blur(8px); border-bottom:1px solid var(--mist); }
+  .nav-row{ display:flex; align-items:center; justify-content:space-between; padding:16px 0; }
+  .brand{ display:flex; align-items:baseline; gap:9px; font-family:var(--serif); font-weight:600; font-size:17px; color:var(--ink-navy); text-decoration:none; letter-spacing:0.2px; }
+  .brand small{ font-family:var(--sans); font-weight:500; font-size:13px; color:var(--ink-muted); }
+  .brand .x{ color:var(--teal); font-family:var(--sans); font-weight:600; }
+  .nav-links{ display:flex; align-items:center; gap:34px; }
+  .nav-links a:not(.btn){ text-decoration:none; font-size:14.5px; font-weight:500; color:var(--ink-body); position:relative; padding:4px 0; }
+  .nav-links a:not(.btn)::after{ content:""; position:absolute; left:0; right:0; bottom:-2px; height:2px; background:var(--teal); transform:scaleX(0); transform-origin:left; transition:transform .25s ease; }
+  .nav-links a:not(.btn):hover::after, .nav-links a:not(.btn):focus-visible::after{ transform:scaleX(1); }
+  .nav-links a.btn{ text-decoration:none; margin-left:4px; }
+  .btn{ display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:14.5px; text-decoration:none; padding:11px 22px; border-radius:2px; border:1px solid transparent; transition:background .2s ease, color .2s ease, border-color .2s ease, transform .15s ease; }
+  .btn-primary{ background:var(--ink-navy); color:#fff; }
+  .btn-primary:hover{ background:var(--navy-950); transform:translateY(-1px); }
+  .btn-ghost{ border-color:var(--ink-navy); color:var(--ink-navy); background:transparent; }
+  .btn-ghost:hover{ background:var(--ink-navy); color:#fff; }
+  .btn-teal{ background:var(--teal); color:#fff; }
+  .btn-teal:hover{ background:var(--teal-bright); transform:translateY(-1px); }
+  .btn:focus-visible, a:focus-visible, button:focus-visible{ outline:2px solid var(--teal); outline-offset:2px; }
+  .nav-toggle{ display:none; background:none; border:none; padding:6px; }
+  .nav-toggle span, .nav-toggle span::before, .nav-toggle span::after{ content:""; display:block; width:22px; height:2px; background:var(--ink-navy); position:relative; transition:.2s; }
+  .nav-toggle span::before{ position:absolute; top:-7px; }
+  .nav-toggle span::after{ position:absolute; top:7px; }
+  .hero{ padding:74px 0 66px; }
+  .hero-grid{ display:grid; grid-template-columns:1.5fr 1fr; gap:56px; align-items:start; }
+  .kicker{ font-size:14.5px; font-weight:600; color:var(--teal); margin-bottom:16px; }
+  .hero h1{ font-size:clamp(42px, 6vw, 66px); line-height:1.03; letter-spacing:-0.5px; }
+  .hero .lede{ font-size:19px; color:var(--ink-muted); max-width:52ch; margin-top:22px; line-height:1.65; }
+  .hero-ctas{ display:flex; gap:14px; margin-top:32px; flex-wrap:wrap; }
+  .fact-panel{ border:1px solid var(--mist); background:var(--paper-raised); padding:28px 26px; }
+  .fact-panel .fp-label{ font-size:13px; font-weight:600; color:var(--ink-muted); margin-bottom:18px; }
+  .fact-row{ display:flex; justify-content:space-between; gap:16px; padding:12px 0; border-top:1px solid var(--mist-soft); }
+  .fact-row:first-of-type{ border-top:none; }
+  .fact-row dt{ font-size:13.5px; color:var(--ink-muted); }
+  .fact-row dd{ margin:0; font-size:13.5px; font-weight:600; text-align:right; color:var(--ink-navy); max-width:60%; }
+  .fact-panel .facilitated{ margin-top:20px; padding-top:20px; border-top:1px solid var(--mist); font-size:13.5px; color:var(--ink-muted); }
+  .fact-panel .facilitated strong{ color:var(--ink-navy); display:block; font-size:14.5px; margin-bottom:2px; }
+  section.hero{ animation:heroIn .7s ease both; }
+  @keyframes heroIn{ from{opacity:0; transform:translateY(18px);} to{opacity:1; transform:none;} }
+  .section{ padding:78px 0; border-top:1px solid var(--mist); }
+  .section-head{ max-width:640px; margin-bottom:44px; }
+  .section-num{ font-size:13px; font-weight:600; color:var(--gold); margin-bottom:10px; letter-spacing:0.3px; }
+  .section h2{ font-size:clamp(28px, 3.4vw, 38px); line-height:1.12; }
+  .section .section-desc{ color:var(--ink-muted); font-size:16.5px; margin-top:16px; max-width:60ch; }
+  .journey{ position:relative; }
+  .journey-line{ position:relative; height:2px; background:var(--mist); margin:6px 0 0; overflow:hidden; }
+  .journey-line::after{ content:""; position:absolute; inset:0; background:var(--teal); transform:scaleX(0); transform-origin:left; transition:transform 1.1s cubic-bezier(.22,.7,.2,1); }
+  .journey.in-view .journey-line::after{ transform:scaleX(1); }
+  .journey-steps{ display:grid; grid-template-columns:repeat(4,1fr); gap:22px; margin-top:0; }
+  .jstep{ padding-top:26px; position:relative; }
+  .jstep::before{ content:attr(data-n); position:absolute; top:-10px; left:0; width:19px; height:19px; border-radius:50%; background:var(--paper); border:2px solid var(--mist); color:var(--ink-muted); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; transform:translateY(-50%); }
+  .journey.in-view .jstep::before{ border-color:var(--teal); color:var(--teal); background:var(--paper-raised); }
+  .jstep h3{ font-family:var(--sans); font-size:15.5px; font-weight:700; color:var(--ink-navy); margin-top:16px; }
+  .jstep p{ font-size:13.8px; color:var(--ink-muted); margin:8px 0 0; line-height:1.55; }
+  .tabbar{ display:flex; gap:6px; flex-wrap:wrap; border-bottom:1px solid var(--mist); padding-bottom:0; }
+  .tab{ background:none; border:none; padding:14px 20px; font-size:14.5px; font-weight:600; color:var(--ink-muted); border-bottom:2px solid transparent; margin-bottom:-1px; transition:color .2s ease, border-color .2s ease; }
+  .tab .tn{ color:var(--gold); margin-right:8px; font-family:var(--serif); font-style:italic; }
+  .tab[aria-selected="true"]{ color:var(--ink-navy); border-color:var(--teal); }
+  .tab:hover{ color:var(--ink-navy); }
+  .tabpanel{ padding-top:38px; display:none; }
+  .tabpanel.active{ display:block; animation:fadeIn .35s ease; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+  .week-head{ margin-bottom:8px; }
+  .week-head .wtitle{ font-size:24px; }
+  .week-head .wsub{ color:var(--teal); font-weight:600; font-size:14.5px; margin-top:6px; }
+  .week-intro{ color:var(--ink-muted); margin:18px 0 34px; max-width:70ch; font-size:15.5px; }
+  .topic{ margin-bottom:30px; padding-left:18px; border-left:3px solid var(--gold); }
+  .topic h4{ font-family:var(--sans); font-size:16.5px; font-weight:700; color:var(--ink-navy); margin:0 0 8px; }
+  .topic .lead{ font-size:14.8px; color:var(--ink-muted); margin:0 0 10px; }
+  .topic ul{ margin:0; padding-left:20px; }
+  .topic li{ font-size:14.8px; color:var(--ink-body); margin-bottom:6px; }
+  .topic .note{ font-size:14px; color:var(--ink-muted); font-style:italic; margin-top:10px; }
+  .outcome{ margin-top:12px; background:var(--mist-soft); border:1px solid var(--mist); padding:20px 22px; }
+  .outcome .ol{ font-size:12.5px; font-weight:700; color:var(--teal); letter-spacing:0.4px; margin-bottom:6px; }
+  .outcome p{ margin:0; font-size:14.8px; color:var(--ink-navy); line-height:1.6; }
+  .ladder{ display:flex; flex-direction:column; gap:0; max-width:640px; }
+  .rung{ border-top:1px solid var(--mist); padding:22px 0; display:flex; align-items:baseline; gap:20px; }
+  .rung:last-child{ border-bottom:1px solid var(--mist); }
+  .rung .rnum{ font-family:var(--serif); font-style:italic; font-size:26px; color:var(--gold); width:34px; flex:none; }
+  .rung .rtext strong{ display:block; color:var(--ink-navy); font-size:16.5px; margin-bottom:3px; }
+  .rung .rtext span{ color:var(--ink-muted); font-size:14.5px; }
+  .rung.r1{ margin-left:0; }
+  .rung.r2{ margin-left:32px; }
+  .rung.r3{ margin-left:64px; }
+  .closing-line{ margin-top:44px; padding:30px 0 0; border-top:1px solid var(--mist); }
+  .closing-line p{ font-family:var(--serif); font-style:italic; font-size:22px; color:var(--ink-navy); max-width:20ch; }
+  .fac-grid{ display:grid; grid-template-columns:280px 1fr; gap:56px; }
+  .monogram{ width:64px; height:64px; border-radius:50%; background:var(--ink-navy); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-size:22px; font-weight:600; margin-bottom:20px; }
+  .fac-id h3{ font-size:21px; }
+  .fac-id .role{ color:var(--teal); font-weight:600; font-size:14px; margin-top:6px; }
+  .fac-cred{ list-style:none; margin:22px 0 0; padding:0; }
+  .fac-cred li{ font-size:13.8px; color:var(--ink-muted); padding:10px 0; border-top:1px solid var(--mist-soft); }
+  .fac-cred li:first-child{ border-top:1px solid var(--mist); }
+  .fac-bio p{ font-size:15.5px; color:var(--ink-body); margin:0 0 18px; max-width:66ch; line-height:1.7; }
+  .fac-quote{ font-family:var(--serif); font-style:italic; font-size:19px; color:var(--ink-navy); border-left:3px solid var(--teal); padding-left:20px; margin:26px 0; max-width:56ch; }
+  .awards{ margin-top:28px; }
+  .awards .al{ font-size:12.5px; font-weight:700; color:var(--gold); letter-spacing:0.4px; margin-bottom:12px; }
+  .award-list{ display:flex; flex-wrap:wrap; gap:10px 0; }
+  .award-item{ font-size:13.5px; color:var(--ink-navy); padding:0 18px 0 0; margin-right:18px; border-right:1px solid var(--mist); }
+  .award-item:last-child{ border-right:none; }
+  .connect{ background:var(--navy-950); color:#fff; padding:80px 0; border-top:none; }
+  .connect .section-head h2{ color:#fff; }
+  .connect .section-desc{ color:#AEB9CC; }
+  .connect-grid{ display:grid; grid-template-columns:1.1fr 1fr; gap:56px; align-items:end; }
+  .connect-quote p{ font-family:var(--serif); font-style:italic; font-size:26px; line-height:1.4; color:#fff; max-width:16ch; }
+  .connect-quote .tag{ color:var(--teal-bright); font-weight:600; font-size:13.5px; margin-top:18px; letter-spacing:0.3px; }
+  .link-list{ list-style:none; margin:0; padding:0; }
+  .link-list li{ border-top:1px solid rgba(255,255,255,0.14); }
+  .link-list li:last-child{ border-bottom:1px solid rgba(255,255,255,0.14); }
+  .link-list a{ display:flex; justify-content:space-between; align-items:center; text-decoration:none; padding:18px 2px; color:#fff; font-size:16px; font-weight:500; }
+  .link-list a .ll-label{ color:#8FA0BE; font-size:13px; font-weight:600; }
+  .link-list a .ll-val{ font-weight:600; }
+  .link-list a:hover .ll-val{ color:var(--teal-bright); }
+  .foot{ padding:26px 0; }
+  .foot-row{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+  .foot-row span{ font-size:12.8px; color:var(--ink-muted); }
+  @media (max-width: 900px){
+    .hero-grid{ grid-template-columns:1fr; gap:36px; }
+    .journey-steps{ grid-template-columns:repeat(2,1fr); row-gap:34px; }
+    .fac-grid{ grid-template-columns:1fr; gap:30px; }
+    .connect-grid{ grid-template-columns:1fr; gap:36px; }
+    .rung.r2{ margin-left:16px; }
+    .rung.r3{ margin-left:32px; }
+  }
+  @media (max-width: 680px){
+    .nav-links{ display:none; }
+    .nav-toggle{ display:block; }
+    .nav.open .nav-links{ display:flex; flex-direction:column; align-items:flex-start; gap:0; position:absolute; top:100%; left:0; right:0; background:var(--paper); border-bottom:1px solid var(--mist); padding:6px 28px 20px; }
+    .nav.open .nav-links a:not(.btn){ padding:12px 0; border-top:1px solid var(--mist-soft); width:100%; }
+    .nav.open .nav-links a.btn{ margin:16px 0 0; }
+    .hero{ padding:46px 0 40px; }
+    .section{ padding:56px 0; }
+    .award-item{ border-right:none; padding-right:0; margin-right:0; width:100%; padding-top:0; }
+    .award-list{ flex-direction:column; gap:10px; }
+  }
+</style>
+</head>
+<body>
+<nav class="nav" id="nav">
+  <div class="wrap nav-row">
+    <a href="#top" class="brand">AI Academy <span class="x">×</span> <small>World HR Connect</small></a>
+    <div class="nav-links">
+      <a href="#program">Program</a>
+      <a href="#curriculum">Curriculum</a>
+      <a href="#facilitator">Facilitator</a>
+      <a href="#connect">Connect</a>
+      <a class="btn btn-primary" href="#connect">Get in Touch</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false"><span></span></button>
+  </div>
+</nav>
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="kicker">AI in HR — Practical Certification Program</div>
+        <h1>From Hire to Exit.</h1>
+        <p class="lede">A one-month, hands-on program for applying GPTs, AI tools and AI agents across the entire HR lifecycle — built for professionals ready to move from talking about AI to actually using it.</p>
+        <div class="hero-ctas">
+          <a href="#curriculum" class="btn btn-teal">View the Curriculum</a>
+          <a href="#facilitator" class="btn btn-ghost">Meet the Facilitator</a>
+        </div>
+      </div>
+      <div class="fact-panel">
+        <div class="fp-label">Program at a glance</div>
+        <dl>
+          <div class="fact-row"><dt>Duration</dt><dd>1 Month</dd></div>
+          <div class="fact-row"><dt>Format</dt><dd>Online · 1 live session / week</dd></div>
+          <div class="fact-row"><dt>Approach</dt><dd>Practical, hands-on, application-led</dd></div>
+          <div class="fact-row"><dt>Designed for</dt><dd>HR professionals, leaders, recruiters, HRBPs &amp; students</dd></div>
+        </dl>
+        <div class="facilitated">
+          <strong>Nissamudheen Firoz</strong>
+          HR Leader, Author &amp; AI Innovator — VP HR, Bridgeway Group
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section" id="program">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Learn AI. Apply AI. Build with AI.</h2>
+        <p class="section-desc">The program follows a progressive four-week journey across the HR lifecycle — moving participants from using AI tools to analysing HR information, and finally to building AI-powered HR solutions of their own.</p>
+      </div>
+      <div class="journey" id="journey">
+        <div class="journey-line"></div>
+        <div class="journey-steps">
+          <div class="jstep" data-n="1"><h3>Hire &amp; Onboard</h3><p>Job descriptions, recruitment, candidate screening and employee onboarding.</p></div>
+          <div class="jstep" data-n="2"><h3>Engage &amp; Perform</h3><p>Employee engagement, communication, performance management and development.</p></div>
+          <div class="jstep" data-n="3"><h3>Govern &amp; Comply</h3><p>HR policy drafting, policy knowledge assistants and the New Labour Codes.</p></div>
+          <div class="jstep" data-n="4"><h3>Predict &amp; Build</h3><p>Attrition analysis, retention insights and building practical HR AI agents.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section" id="curriculum">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>The Four-Week Curriculum</h2>
+        <p class="section-desc">Every week pairs a real HR use case with a practical AI application — so each session ends with something you can use the same day.</p>
+      </div>
+      <div class="tabbar" role="tablist" aria-label="Program weeks" id="tabbar">
+        <button class="tab" role="tab" id="tab-1" aria-controls="panel-1" aria-selected="true"><span class="tn">01</span>Hire &amp; Onboard</button>
+        <button class="tab" role="tab" id="tab-2" aria-controls="panel-2" aria-selected="false"><span class="tn">02</span>Engage &amp; Perform</button>
+        <button class="tab" role="tab" id="tab-3" aria-controls="panel-3" aria-selected="false"><span class="tn">03</span>Govern &amp; Comply</button>
+        <button class="tab" role="tab" id="tab-4" aria-controls="panel-4" aria-selected="false"><span class="tn">04</span>Predict &amp; Build</button>
+      </div>
+      <div class="tabpanel active" id="panel-1" role="tabpanel" aria-labelledby="tab-1">
+        <div class="week-head"><div class="wtitle">AI-Powered Talent Journey: From Hire to Onboard</div><div class="wsub">Talent Acquisition &amp; Employee Onboarding</div></div>
+        <p class="week-intro">The first week focuses on how AI and GPTs can support HR professionals throughout the talent acquisition and employee onboarding journey — making traditional recruitment activities faster, more structured and more effective.</p>
+        <div class="topic"><h4>1. AI-Powered Job Description Development</h4><p class="lead">Using GPTs to create structured, professional Job Descriptions based on the requirements of a position.</p><ul><li>Developing Job Descriptions using GPTs</li><li>Creating clear roles and responsibilities</li><li>Identifying skills, qualifications and experience requirements</li><li>Developing competency requirements for different positions</li><li>Improving existing Job Descriptions using AI</li><li>Creating role-specific recruitment content</li></ul><p class="note">Includes how the quality of your prompt and input information affects the quality of AI-generated outputs.</p></div>
+        <div class="topic"><h4>2. AI in Talent Acquisition</h4><p class="lead">Practical applications of AI across different stages of recruitment:</p><ul><li>Using GPTs for recruitment planning</li><li>Creating recruitment advertisements and job postings</li><li>Developing candidate sourcing approaches</li><li>Creating professional candidate communication</li><li>Developing interview questions based on the Job Description</li><li>Creating structured interview evaluation criteria</li><li>Preparing candidate assessment frameworks</li></ul><p class="note">The objective: AI as a recruitment assistant, not just a content-generation tool.</p></div>
+        <div class="topic"><h4>3. Resume Screening &amp; Candidate Shortlisting</h4><p class="lead">How GPTs can assist in reviewing candidate profiles against defined job requirements:</p><ul><li>Comparing resumes against Job Descriptions</li><li>Identifying relevant skills and experience</li><li>Candidate screening based on predefined criteria</li><li>Comparing multiple candidate profiles</li><li>Creating structured candidate evaluation summaries</li><li>Supporting candidate shortlisting decisions</li></ul><p class="note">Includes a discussion on human review, fairness and responsible AI usage in recruitment decisions.</p></div>
+        <div class="topic"><h4>4. AI-Powered Employee Onboarding</h4><p class="lead">Moving from hiring to onboarding:</p><ul><li>Creating structured onboarding plans using AI</li><li>Developing joining and welcome communications</li><li>Creating employee induction schedules</li><li>Developing role-specific onboarding checklists</li><li>Creating FAQs for new employees</li><li>Using GPTs as onboarding knowledge assistants</li><li>Personalising the onboarding experience using AI</li></ul></div>
+        <div class="outcome"><div class="ol">WEEK 1 OUTCOME</div><p>Use GPTs and AI tools to support the journey from Job Description → Recruitment → Candidate Screening → Selection Support → Employee Onboarding.</p></div>
+      </div>
+      <div class="tabpanel" id="panel-2" role="tabpanel" aria-labelledby="tab-2">
+        <div class="week-head"><div class="wtitle">AI-Powered People Experience: Engage &amp; Perform</div><div class="wsub">Employee Engagement &amp; Performance Management</div></div>
+        <p class="week-intro">Week 2 covers how employees experience the organisation, and how performance is managed and developed — moving from administrative processes towards more meaningful, data-supported people practices.</p>
+        <div class="topic"><h4>1. AI in Employee Engagement</h4><p class="lead">Supporting the design, analysis and follow-up of engagement initiatives:</p><ul><li>Creating Employee Engagement Surveys using GPTs</li><li>Developing organisation-specific survey questions</li><li>Creating pulse surveys</li><li>Analysing employee feedback</li><li>Identifying recurring themes in employee responses</li><li>Using AI for basic sentiment analysis</li><li>Identifying engagement drivers and areas of concern</li><li>Developing engagement action plans based on findings</li></ul></div>
+        <div class="topic"><h4>2. AI for Employee Communication &amp; Experience</h4><p class="lead">How GPTs can support HR communication and employee experience:</p><ul><li>Creating employee communications</li><li>Developing recognition and appreciation messages</li><li>Creating engagement campaign ideas</li><li>Generating employee FAQs</li><li>Personalising HR communication</li><li>Developing employee listening initiatives</li></ul><p class="note">Focus: quality, consistency and speed of HR communication — without losing the human connection.</p></div>
+        <div class="topic"><h4>3. AI-Powered Performance Management</h4><p class="lead">How AI can support different stages of performance management:</p><ul><li>Developing KPIs using GPTs</li><li>Aligning KPIs with roles and responsibilities</li><li>Developing measurable performance indicators</li><li>Supporting performance review preparation</li><li>Structuring performance review discussions</li><li>Analysing performance information</li><li>Creating performance summaries using AI</li><li>Identifying potential development areas</li></ul></div>
+        <div class="topic"><h4>4. Employee Development through AI</h4><p class="lead">Supporting employee development following a performance review:</p><ul><li>Creating Individual Development Plans (IDPs)</li><li>Identifying development priorities</li><li>Developing learning recommendations</li><li>Creating Performance Improvement Plans (PIPs)</li><li>Structuring follow-up actions</li><li>Using AI to support continuous performance conversations</li></ul></div>
+        <div class="outcome"><div class="ol">WEEK 2 OUTCOME</div><p>Use AI to strengthen the journey from Employee Engagement → Employee Feedback → Performance Measurement → Performance Review → Employee Development.</p></div>
+      </div>
+      <div class="tabpanel" id="panel-3" role="tabpanel" aria-labelledby="tab-3">
+        <div class="week-head"><div class="wtitle">AI-Powered HR Governance: Policy to Compliance</div><div class="wsub">HR Policies &amp; New Labour Codes</div></div>
+        <p class="week-intro">Week 3 focuses on one of HR's most important responsibilities — developing clear HR policies, and helping professionals navigate complex employment and compliance-related information.</p>
+        <div class="topic"><h4>1. Developing HR Policies Using GPTs</h4><p class="lead">How GPTs can assist in developing structured HR policies:</p><ul><li>Developing HR policy frameworks</li><li>Drafting new HR policies using GPTs</li><li>Reviewing existing HR policies</li><li>Identifying gaps in policy documents</li><li>Simplifying complex policy language</li><li>Creating employee-friendly policy summaries</li><li>Developing FAQs based on HR policies</li><li>Creating policy communication materials</li></ul></div>
+        <div class="topic"><h4>2. AI as an HR Policy Knowledge Assistant</h4><p class="lead">Turning organisational HR policies into accessible knowledge resources:</p><ul><li>Policy Q&amp;A assistants</li><li>Employee FAQ assistants</li><li>HR knowledge assistants</li><li>Policy interpretation support</li><li>Quick retrieval of relevant policy information</li></ul><p class="note">How AI can help HR teams reduce repetitive queries while improving employee access to information.</p></div>
+        <div class="topic"><h4>3. Understanding the New Labour Codes with AI Support</h4><p class="lead">Using AI to work with India's New Labour Codes:</p><ul><li>Understand and simplify labour-law-related information</li><li>Summarise complex provisions for easier learning</li><li>Compare requirements with existing HR practices</li><li>Develop compliance checklists</li><li>Create internal awareness and communication materials</li><li>Organise labour-law knowledge for HR reference</li></ul></div>
+        <div class="topic"><h4>4. Responsible AI in Policy &amp; Compliance</h4><p class="lead">Understanding the limitations of AI in sensitive areas such as policy interpretation and legal compliance.</p><p class="note">AI-generated information should support professional work — critical policy and legal decisions require appropriate verification and expert review.</p></div>
+        <div class="outcome"><div class="ol">WEEK 3 OUTCOME</div><p>Use AI as a support system for HR Policy Development → Policy Review → Employee Communication → Labour Code Learning → Compliance Support.</p></div>
+      </div>
+      <div class="tabpanel" id="panel-4" role="tabpanel" aria-labelledby="tab-4">
+        <div class="week-head"><div class="wtitle">Predict &amp; Build: HR Analytics to AI Agents</div><div class="wsub">Attrition Analysis &amp; AI Agent Development</div></div>
+        <p class="week-intro">The final week moves from using AI tools to analysing HR information — and begins building AI-powered HR solutions. This is the culmination of the four-week journey.</p>
+        <div class="topic"><h4>1. Understanding Attrition through AI</h4><p class="lead">Supporting employee attrition and retention analysis:</p><ul><li>Understanding employee attrition data</li><li>Structuring HR data for analysis</li><li>Identifying attrition patterns and trends</li><li>Analysing potential reasons for employee turnover</li><li>Exploring department, tenure, role or other relevant patterns</li><li>Identifying possible retention concerns</li><li>Creating management-friendly attrition summaries</li></ul></div>
+        <div class="topic"><h4>2. Moving from Attrition Data to Retention Insights</h4><p class="lead">Understanding what the data may be telling HR — not just calculating attrition:</p><ul><li>Identifying potential attrition drivers</li><li>Analysing employee feedback alongside attrition information</li><li>Creating retention-focused insights</li><li>Developing possible HR interventions</li><li>Preparing attrition dashboards and management summaries</li><li>Using AI to support evidence-based HR discussions</li></ul></div>
+        <div class="topic"><h4>3. Introduction to AI Agents for HR</h4><p class="lead">The next stage of AI adoption — AI Agents:</p><ul><li>What is an AI Agent?</li><li>How is an AI Agent different from a normal chatbot or GPT?</li><li>Where can AI Agents be used in HR?</li><li>Identifying repetitive HR processes suitable for AI support</li><li>How instructions, knowledge and workflows work together</li><li>Understanding the basic architecture of an HR AI Agent</li></ul></div>
+        <div class="topic"><h4>4. Developing Practical AI Agents for HR</h4><p class="lead">Potential AI-agent applications across the HR lifecycle:</p><ul><li>Recruitment Assistant</li><li>Resume Screening Assistant</li><li>Employee Onboarding Assistant</li><li>Performance Management Assistant</li><li>Employee Engagement Analysis Assistant</li><li>HR Policy Assistant</li><li>HR Knowledge Assistant</li><li>Attrition Analysis Assistant</li></ul><p class="note">The process: HR Problem → AI Use Case → Instructions → Knowledge → Workflow → AI Agent.</p></div>
+        <div class="topic"><h4>5. Becoming an AI-Ready HR Professional</h4><p class="lead">How to continue the AI journey after the program — three levels:</p><ul><li>Level 1 — Use AI effectively</li><li>Level 2 — Apply AI independently to HR problems</li><li>Level 3 — Build AI-powered solutions for HR</li></ul></div>
+        <div class="outcome"><div class="ol">WEEK 4 OUTCOME</div><p>Understand how AI can support Attrition Analysis → Retention Insights → HR Decision Support → AI Agent Development.</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>What You'll Walk Away With</h2>
+        <p class="section-desc">This program is built to be practical, not theoretical — real HR use cases, live GPT demonstrations and AI-powered workflows you can adapt to your own organisation.</p>
+      </div>
+      <div class="ladder">
+        <div class="rung r1"><span class="rnum">1</span><div class="rtext"><strong>Use AI effectively</strong><span>Comfortable, everyday use of GPTs and AI tools in HR work.</span></div></div>
+        <div class="rung r2"><span class="rnum">2</span><div class="rtext"><strong>Apply AI independently to HR problems</strong><span>Judgment to pick the right AI approach for a real HR challenge.</span></div></div>
+        <div class="rung r3"><span class="rnum">3</span><div class="rtext"><strong>Build AI-powered solutions for HR</strong><span>The skills to design and build your own HR AI agents.</span></div></div>
+      </div>
+      <div class="closing-line"><p>"I know how to use AI in my HR role."</p></div>
+    </div>
+  </section>
+  <section class="section" id="facilitator">
+    <div class="wrap">
+      <div class="section-head"><h2>About the Facilitator</h2></div>
+      <div class="fac-grid">
+        <div class="fac-id">
+          <div class="monogram">NF</div>
+          <h3>Nissamudheen Firoz</h3>
+          <div class="role">HR Leader · Author · AI Innovator</div>
+          <ul class="fac-cred">
+            <li>VP – Human Resources, Bridgeway Group</li>
+            <li>19+ years of HR experience</li>
+            <li>Executive PGP, Strategic HRM — XLRI Delhi</li>
+            <li>MSW-HR — Bharathiar University</li>
+            <li>8+ international HR certifications</li>
+          </ul>
+        </div>
+        <div class="fac-bio">
+          <p>Nissamudheen Firoz brings 19+ years of HR experience at the intersection of people, leadership and technology, with certifications spanning Performance Management, Organisation Development, Compensation &amp; Benefits, HR Analytics and Change Management.</p>
+          <p>He is the author of the Amazon Kindle Bestseller <em>"FutureReady Leadership: How to Thrive in the Age of AI,"</em> and the founder of World HR Connect and AI Academy — platforms built to advance AI literacy and practical AI adoption among HR professionals.</p>
+          <div class="fac-quote">Through this program, he brings hands-on, real-world HR and AI-agent-building experience directly into the classroom.</div>
+          <div class="awards">
+            <div class="al">RECOGNITIONS</div>
+            <div class="award-list">
+              <span class="award-item">Best HR Partner — Mercedes-Benz India</span>
+              <span class="award-item">Best Employer Brand Kerala — World HRD Congress</span>
+              <span class="award-item">Best HR of the Year — NIPM Kerala</span>
+              <span class="award-item">Indywood Future Ready HR Leadership Award</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="connect" id="connect">
+    <div class="wrap connect-grid">
+      <div class="connect-quote">
+        <p>From Hire to Exit. From using AI to building AI.</p>
+        <div class="tag">Become an AI-Ready HR Professional</div>
+      </div>
+      <ul class="link-list">
+        <li><a href="https://www.aiacademyedu.com/" target="_blank" rel="noopener"><span class="ll-label">AI ACADEMY</span><span class="ll-val">aiacademyedu.com</span></a></li>
+        <li><a href="https://www.worldhrconnect.com/" target="_blank" rel="noopener"><span class="ll-label">WORLD HR CONNECT</span><span class="ll-val">worldhrconnect.com</span></a></li>
+        <li><a href="https://www.linkedin.com/in/ai-academy-world-hr-connect-0396aa42a/" target="_blank" rel="noopener"><span class="ll-label">LINKEDIN</span><span class="ll-val">Connect</span></a></li>
+        <li><a href="https://www.instagram.com/ai_hr_academy/?hl=en" target="_blank" rel="noopener"><span class="ll-label">INSTAGRAM</span><span class="ll-val">@ai_hr_academy</span></a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+<footer class="foot">
+  <div class="wrap foot-row">
+    <span>© 2026 AI Academy × World HR Connect. All rights reserved.</span>
+    <span>AI in HR — Practical Certification Program</span>
+  </div>
+</footer>
+<script>
+  const nav = document.getElementById('nav');
+  const navToggle = document.getElementById('navToggle');
+  navToggle.addEventListener('click', () => {
+    const isOpen = nav.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', () => { nav.classList.remove('open'); navToggle.setAttribute('aria-expanded','false'); });
+  });
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const panels = Array.from(document.querySelectorAll('.tabpanel'));
+  tabs.forEach((tab, i) => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.setAttribute('aria-selected','false'));
+      panels.forEach(p => p.classList.remove('active'));
+      tab.setAttribute('aria-selected','true');
+      panels[i].classList.add('active');
+      panels[i].scrollIntoView({ behavior:'smooth', block:'nearest' });
+    });
+  });
+  const journey = document.getElementById('journey');
+  const jio = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        journey.classList.add('in-view');
+        jio.unobserve(journey);
+      }
+    });
+  }, { threshold: 0.3 });
+  jio.observe(journey);
+</script>
+</body>
+</html>
