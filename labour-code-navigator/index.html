@@ -203,6 +203,13 @@
   .subview{display:none;}
   .subview.active{display:block;}
 
+  .mode-toggle{display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap;}
+  .mode-toggle button{
+    appearance:none; cursor:pointer; border:1px solid var(--border); background:var(--surface); color:var(--ink-soft);
+    font:600 12.5px 'Public Sans',sans-serif; padding:9px 14px; border-radius:10px; flex:1; min-width:200px; text-align:center;
+  }
+  .mode-toggle button[aria-selected="true"]{background:var(--accent-soft); color:var(--accent-ink); border-color:var(--accent-line);}
+
   .calc-grid{display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start;}
   @media (max-width:860px){.calc-grid{grid-template-columns:1fr;}}
   .calc-panel{padding:22px;}
@@ -363,19 +370,37 @@
 
       <!-- Salary calculator -->
       <div class="subview active" id="sub-calc">
+        <div class="mode-toggle" role="tablist" aria-label="Calculator mode" id="calcModeToggle">
+          <button type="button" role="tab" aria-selected="true" data-calcmode="components">🧩 I know each pay component</button>
+          <button type="button" role="tab" aria-selected="false" data-calcmode="gross">💵 I only know the Gross / CTC</button>
+        </div>
         <div class="calc-grid">
           <div class="calc-panel card">
-            <h3>Your CTC structure</h3>
-            <div class="hint">Enter monthly figures for one representative role. Nothing leaves your browser.</div>
-            <div class="two-col">
-              <div class="field"><label for="inBasic">Basic pay (₹)</label><input type="number" id="inBasic" value="20000" min="0"></div>
-              <div class="field"><label for="inDA">Dearness allowance (₹)</label><input type="number" id="inDA" value="0" min="0"></div>
-              <div class="field"><label for="inHRA">HRA (₹)</label><input type="number" id="inHRA" value="10000" min="0"></div>
-              <div class="field"><label for="inConv">Conveyance allowance (₹)</label><input type="number" id="inConv" value="3000" min="0"></div>
-              <div class="field"><label for="inSpecial">Special / other allowances (₹)</label><input type="number" id="inSpecial" value="14000" min="0"></div>
-              <div class="field"><label for="inOT">Overtime / commission (₹)</label><input type="number" id="inOT" value="3000" min="0"></div>
+            <div id="calcFieldsComponents">
+              <h3>Your CTC structure</h3>
+              <div class="hint">Enter monthly figures for one representative role. Nothing leaves your browser.</div>
+              <div class="two-col">
+                <div class="field"><label for="inBasic">Basic pay (₹)</label><input type="number" id="inBasic" value="20000" min="0"></div>
+                <div class="field"><label for="inDA">Dearness allowance (₹)</label><input type="number" id="inDA" value="0" min="0"></div>
+                <div class="field"><label for="inHRA">HRA (₹)</label><input type="number" id="inHRA" value="10000" min="0"></div>
+                <div class="field"><label for="inConv">Conveyance allowance (₹)</label><input type="number" id="inConv" value="3000" min="0"></div>
+                <div class="field"><label for="inSpecial">Special / other allowances (₹)</label><input type="number" id="inSpecial" value="14000" min="0"></div>
+                <div class="field"><label for="inOT">Overtime / commission (₹)</label><input type="number" id="inOT" value="3000" min="0"></div>
+              </div>
+              <button class="btn btn-primary" id="calcBtn" style="width:100%; justify-content:center;">Check compliance</button>
             </div>
-            <button class="btn btn-primary" id="calcBtn" style="width:100%; justify-content:center;">Check compliance</button>
+            <div id="calcFieldsGross" hidden>
+              <h3>Build a structure from Gross / CTC</h3>
+              <div class="hint">Enter only the total monthly gross (or CTC) for one role. We'll suggest a wage-code-compliant Basic + DA / HRA / allowance split you can fine-tune afterwards.</div>
+              <div class="field"><label for="inGross">Monthly Gross / CTC (₹)</label><input type="number" id="inGross" value="50000" min="0"></div>
+              <div class="two-col">
+                <div class="field"><label for="inGrossPct">Basic + DA target (% of Gross)</label><input type="number" id="inGrossPct" value="50" min="50" max="90"></div>
+                <div class="field"><label for="inGrossHRAPct">HRA (% of Basic)</label><input type="number" id="inGrossHRAPct" value="40" min="0" max="100"></div>
+              </div>
+              <div class="field"><label for="inGrossConv">Fixed conveyance (₹, optional)</label><input type="number" id="inGrossConv" value="1600" min="0"></div>
+              <button class="btn btn-primary" id="grossBtn" style="width:100%; justify-content:center;">Suggest compliant structure</button>
+              <div class="note-box" style="margin-top:14px;">The wage code sets a <strong>floor</strong> of 50% — it doesn't mandate one "correct" split above that. This is one reasonable way to hit the floor; adjust the % fields and regenerate, or fine-tune each component after applying it to the calculator.</div>
+            </div>
           </div>
           <div class="calc-panel card" id="calcResults"></div>
         </div>
@@ -782,6 +807,77 @@
   }
   document.getElementById("calcBtn").addEventListener("click", runCalc);
   runCalc();
+
+  /* ---- calculator mode toggle (components vs. gross-only) ---- */
+  function setCalcMode(mode){
+    document.querySelectorAll('#calcModeToggle button').forEach(function(b){
+      b.setAttribute("aria-selected", b.getAttribute("data-calcmode") === mode ? "true" : "false");
+    });
+    document.getElementById("calcFieldsComponents").hidden = mode !== "components";
+    document.getElementById("calcFieldsGross").hidden = mode !== "gross";
+    if(mode === "components"){ runCalc(); } else { runGrossSuggest(); }
+  }
+  document.querySelectorAll('#calcModeToggle button').forEach(function(b){
+    b.addEventListener("click", function(){ setCalcMode(b.getAttribute("data-calcmode")); });
+  });
+
+  /* ---- reverse calculator: suggest a structure from Gross/CTC alone ---- */
+  function runGrossSuggest(){
+    var gross = num("inGross");
+    var pct = parseFloat(document.getElementById("inGrossPct").value);
+    if(isNaN(pct) || pct < 50) pct = 50;
+    if(pct > 90) pct = 90;
+    var hraPct = parseFloat(document.getElementById("inGrossHRAPct").value);
+    if(isNaN(hraPct) || hraPct < 0) hraPct = 0;
+    if(hraPct > 100) hraPct = 100;
+    var conv = num("inGrossConv");
+    var out = document.getElementById("calcResults");
+
+    if(gross <= 0){
+      out.innerHTML = '<div class="note-box">Enter the monthly Gross / CTC on the left, then generate a suggested structure.</div>';
+      return;
+    }
+
+    var basicDA = gross * (pct/100);
+    var hra = basicDA * (hraPct/100);
+    var special = gross - basicDA - hra - conv;
+    var warnBox = "";
+    if(special < 0){
+      hra = Math.max(0, gross - basicDA - conv);
+      special = 0;
+      warnBox = '<div class="note-box" style="border-left-color:var(--warn); color:var(--warn);">HRA + conveyance exceeded what was left after Basic+DA, so HRA was capped to fit inside the Gross figure. Try a lower HRA % or conveyance amount.</div>';
+    }
+    var basic = basicDA, da = 0;
+    var includedPct = (basicDA/gross)*100;
+
+    out.innerHTML =
+      '<h3>Suggested structure</h3>' +
+      '<div class="result-hero" style="background:var(--good-soft); color:var(--good);">' +
+        '<div class="pct">'+includedPct.toFixed(0)+'%</div>' +
+        '<div class="txt"><strong>Meets the 50% floor</strong>Basic + DA is set to '+includedPct.toFixed(1)+'% of Gross.</div>' +
+      '</div>' +
+      '<div class="kv-row"><div class="k">Monthly Gross / CTC</div><div class="v">'+inr(gross)+'</div></div>' +
+      '<div class="kv-row"><div class="k">Basic pay (suggested)</div><div class="v">'+inr(basic)+'</div></div>' +
+      '<div class="kv-row"><div class="k">Dearness allowance</div><div class="v">'+inr(da)+'</div></div>' +
+      '<div class="kv-row"><div class="k">HRA</div><div class="v">'+inr(hra)+'</div></div>' +
+      '<div class="kv-row"><div class="k">Conveyance</div><div class="v">'+inr(conv)+'</div></div>' +
+      '<div class="kv-row"><div class="k">Special / other allowances (balancing figure)</div><div class="v">'+inr(special)+'</div></div>' +
+      '<div class="formula-box" style="margin-top:14px;">Basic + DA = '+pct+'% × Gross = '+inr(basicDA)+'<br>HRA = '+hraPct+'% × Basic = '+inr(hra)+'<br>Special/other = Gross − (Basic+DA) − HRA − Conveyance = '+inr(special)+'</div>' +
+      warnBox +
+      '<button class="btn btn-primary" id="applyGrossBtn" style="width:100%; justify-content:center; margin-top:14px;">Apply to component calculator →</button>' +
+      '<div class="note-box">This is one illustrative split, not the only compliant one — any mix where Basic+DA is at least 50% of Gross satisfies the rule. DA is folded into Basic here; split it out yourself if your policy tracks it separately.</div>';
+
+    document.getElementById("applyGrossBtn").addEventListener("click", function(){
+      document.getElementById("inBasic").value = Math.round(basic);
+      document.getElementById("inDA").value = Math.round(da);
+      document.getElementById("inHRA").value = Math.round(hra);
+      document.getElementById("inConv").value = Math.round(conv);
+      document.getElementById("inSpecial").value = Math.round(special);
+      document.getElementById("inOT").value = 0;
+      setCalcMode("components");
+    });
+  }
+  document.getElementById("grossBtn").addEventListener("click", runGrossSuggest);
 
   /* =========================================================
      WORKER CLASSIFICATION
