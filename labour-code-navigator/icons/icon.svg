@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9c7318"/>
+      <stop offset="100%" stop-color="#d9bd77"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112.6" ry="112.6" fill="url(#g)"/>
+  <g>
+    <line x1="256.00" y1="157.08" x2="256.00" y2="350.21" stroke="#ffffff" stroke-width="10.60" stroke-linecap="round"/>
+    <line x1="208.90" y1="350.21" x2="303.10" y2="350.21" stroke="#ffffff" stroke-width="10.60" stroke-linecap="round"/>
+    <circle cx="256.00" cy="157.08" r="13.78" fill="#ffffff"/>
+    <line x1="175.92" y1="171.21" x2="336.08" y2="171.21" stroke="#ffffff" stroke-width="10.60" stroke-linecap="round"/>
+    <line x1="175.92" y1="171.21" x2="175.92" y2="200.77" stroke="#ffffff" stroke-width="7.42" stroke-linecap="round"/>
+    <path d="M 145.72 219.85 A 31.80 27.03 0 0 0 206.13 219.85" stroke="#ffffff" stroke-width="8.48" fill="none" stroke-linecap="round"/>
+    <line x1="336.08" y1="171.21" x2="336.08" y2="200.77" stroke="#ffffff" stroke-width="7.42" stroke-linecap="round"/>
+    <path d="M 305.87 219.85 A 31.80 27.03 0 0 0 366.28 219.85" stroke="#ffffff" stroke-width="8.48" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,0 +1,15 @@
+{
+  "name": "Labour Code Navigator",
+  "short_name": "Labour Codes",
+  "description": "Reference and compliance companion for India's four new labour codes — built by AI Academy / World HR Connect.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f2f3f7",
+  "theme_color": "#9c7318",
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icons/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
