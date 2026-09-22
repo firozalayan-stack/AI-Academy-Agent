@@ -1081,6 +1081,42 @@
     }
   }
 
+  // Fallback used outside the Claude Artifact preview (e.g. the Vercel-hosted
+  // copy), where window.claude isn't available. Same call signature as the
+  // window.claude.use("sample") function: fn(turns, opts) -> {text, truncated}.
+  // Talks to /api/chat, a serverless function that holds the Anthropic API key
+  // server-side (see api/chat.js) — the key never reaches the browser.
+  function backendSampleFn(turns, opts){
+    opts = opts || {};
+    return fetch("/api/chat", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ turns: turns }),
+      signal: opts.signal
+    }).then(function(res){
+      return res.json().catch(function(){ return {}; }).then(function(data){
+        if(!res.ok){
+          var err = new Error((data && data.error) || ("HTTP "+res.status));
+          err.code = (data && data.code) || "upstream_error";
+          throw err;
+        }
+        if(!data || !data.text){
+          var emptyErr = new Error("empty completion");
+          emptyErr.code = "empty_completion";
+          throw emptyErr;
+        }
+        return { text: data.text, truncated: !!data.truncated };
+      });
+    }).catch(function(e){
+      if(e && e.name === "AbortError"){
+        var abortErr = new Error("cancelled");
+        abortErr.code = "cancelled";
+        throw abortErr;
+      }
+      throw e;
+    });
+  }
+
   async function ensureSample(){
     if(sampleReady) return sampleFn;
     sampleReady = true;
@@ -1090,9 +1126,8 @@
       }
     }catch(e){ sampleFn = null; }
     if(!sampleFn){
-      chatStatus.textContent = "Live AI chat isn't available in this preview — open the published app to ask the agent.";
-      chatSend.disabled = true;
-      chatInput.disabled = true;
+      sampleFn = backendSampleFn;
+      chatStatus.textContent = "Powered by a hosted AI backend · not legal advice";
     }
     return sampleFn;
   }
