@@ -401,6 +401,7 @@
         <button role="tab" aria-selected="false" data-sub="classify">🏷️ Worker classification</button>
         <button role="tab" aria-selected="false" data-sub="gratuity">🎯 Gratuity eligibility</button>
         <button role="tab" aria-selected="false" data-sub="checklist">✅ HR policy checklist</button>
+        <button role="tab" aria-selected="false" data-sub="policyreview">🩺 Policy Review</button>
       </div>
 
       <!-- Salary calculator -->
@@ -479,6 +480,55 @@
           <button class="btn btn-sm" id="resetChecklist" style="margin-left:auto;">Reset</button>
         </div>
         <div class="checklist-groups" id="checklistGroups"></div>
+      </div>
+
+      <!-- Policy Review -->
+      <div class="subview" id="sub-policyreview">
+        <div class="section-head" style="margin-top:0;">
+          <div><h2 style="font-size:18px;">HR policy review</h2><p>Upload or paste your existing HR policy — get an overall health score plus suggestions against the four labour codes.</p></div>
+        </div>
+        <div class="calc-grid">
+          <div class="calc-panel card">
+            <h3>Your policy text</h3>
+            <div class="hint">Upload a .txt file, or paste the policy text directly. (For PDF/Word files, open the file and paste the text here — this in-browser tool can't parse those formats.)</div>
+            <div class="field">
+              <label for="policyFile">Upload policy (.txt)</label>
+              <input type="file" id="policyFile" accept=".txt,text/plain">
+            </div>
+            <div class="field">
+              <label for="policyText">Or paste policy text</label>
+              <textarea id="policyText" rows="8" style="min-height:160px; resize:vertical;" placeholder="Paste your HR policy text here…"></textarea>
+            </div>
+            <button class="btn btn-primary" id="policyReviewBtn" style="width:100%; justify-content:center;">Review policy</button>
+          </div>
+          <div class="calc-panel card" id="policyReviewResults">
+            <div class="note-box">Upload or paste your policy, then run the review.</div>
+          </div>
+        </div>
+
+        <div class="section-head">
+          <div><h2 style="font-size:18px;">Salary structure review</h2><p>Upload or paste your existing salary structure — get feedback against the Code on Wages 50% rule.</p></div>
+        </div>
+        <div class="calc-grid">
+          <div class="calc-panel card">
+            <h3>Your salary structure</h3>
+            <div class="hint">Upload a .txt or .csv file, or paste the structure directly — component names and amounts (e.g. "Basic 20000, HRA 10000, Conveyance 1600…").</div>
+            <div class="field">
+              <label for="salaryStructFile">Upload salary structure (.txt, .csv)</label>
+              <input type="file" id="salaryStructFile" accept=".txt,.csv,text/plain,text/csv">
+            </div>
+            <div class="field">
+              <label for="salaryStructText">Or paste salary structure</label>
+              <textarea id="salaryStructText" rows="8" style="min-height:160px; resize:vertical;" placeholder="e.g. Basic: 20000&#10;HRA: 10000&#10;Conveyance: 1600&#10;Special Allowance: 15000"></textarea>
+            </div>
+            <button class="btn btn-primary" id="salaryReviewBtn" style="width:100%; justify-content:center;">Review salary structure</button>
+          </div>
+          <div class="calc-panel card" id="salaryReviewResults">
+            <div class="note-box">Upload or paste your salary structure, then run the review.</div>
+          </div>
+        </div>
+
+        <div class="note-box">Reviews are AI-generated, grounded on the Code on Wages, Industrial Relations Code, OSH Code and Code on Social Security reference notes used elsewhere in this app. This is a training and self-assessment aid, not legal advice — always confirm against the latest central/state notifications.</div>
       </div>
     </section>
 
@@ -1224,6 +1274,135 @@
   });
 
   ensureSample();
+
+  /* =========================================================
+     POLICY REVIEW — HR policy health score + salary structure review
+  ========================================================= */
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  function readTextFile(file){
+    return new Promise(function(resolve, reject){
+      var reader = new FileReader();
+      reader.onload = function(){ resolve(String(reader.result || "")); };
+      reader.onerror = function(){ reject(new Error("Could not read file")); };
+      reader.readAsText(file);
+    });
+  }
+
+  function scoreStatus(score){
+    if(score >= 80) return "good";
+    if(score >= 50) return "warn";
+    return "bad";
+  }
+
+  function renderReview(out, rawText, heading){
+    var scoreMatch = rawText.match(/SCORE:\s*(\d{1,3})/i);
+    var score = scoreMatch ? Math.max(0, Math.min(100, parseInt(scoreMatch[1], 10))) : null;
+    var status = score === null ? "neutral" : scoreStatus(score);
+    var heroHtml = score === null ? "" :
+      '<div class="result-hero" style="background:var(--'+status+'-soft); color:var(--'+status+');">' +
+        '<div class="pct">'+score+'</div>' +
+        '<div class="txt"><strong>Health score</strong>Out of 100, based on alignment with the four labour codes.</div>' +
+      '</div>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:'+score+'%; background:var(--'+status+');"></div></div>' +
+      '<div style="display:flex; justify-content:space-between; font-size:11px; color:var(--ink-faint); margin-bottom:18px;"><span>0</span><span>50</span><span>100</span></div>';
+
+    var body = rawText.replace(/^SCORE:\s*\d{1,3}\s*$/im, "").trim();
+
+    out.innerHTML =
+      '<h3>'+heading+'</h3>' +
+      heroHtml +
+      '<div style="white-space:pre-wrap; font-size:13.3px; line-height:1.7; margin-top:'+(heroHtml ? "4px" : "0")+';">'+escapeHtml(body)+'</div>' +
+      '<div class="note-box" style="margin-top:16px;">AI-generated training guidance, not legal advice — always confirm against the latest central/state notifications.</div>';
+  }
+
+  var POLICY_REVIEW_PROMPT =
+    "You are reviewing an HR policy document for alignment with India's four new labour codes (Code on Wages, Industrial Relations Code, OSH & Working Conditions Code, Code on Social Security), using ONLY the reference notes provided separately. " +
+    "Assess the policy text below and respond in EXACTLY this structure (plain text, no markdown headers):\n\n" +
+    "SCORE: <a single integer 0-100 overall health score>\n" +
+    "SUMMARY: <one or two sentence overall assessment>\n" +
+    "STRENGTHS:\n- <bullet>\n- <bullet>\n" +
+    "GAPS & RISKS:\n- <bullet, naming the relevant code/provision where relevant>\n- <bullet>\n" +
+    "SUGGESTIONS FOR IMPROVEMENT:\n- <specific, actionable bullet>\n- <specific, actionable bullet>\n\n" +
+    "Be concise and practical. If the text provided doesn't look like an HR policy, say so under SUMMARY and give a low score. " +
+    "End with one line reminding the reader this is a training/self-assessment aid, not legal advice.\n\n=== POLICY TEXT TO REVIEW ===\n";
+
+  var SALARY_REVIEW_PROMPT =
+    "You are reviewing an existing salary/CTC structure for alignment with India's Code on Wages, 2019 — specifically the 'wages' definition in Section 2(y) (Basic + DA + retaining allowance always count as wages; other components such as HRA, conveyance, special allowances, overtime and commission are excluded from wages only up to 50% of total remuneration — any excess must be treated as wages), using ONLY the reference notes provided separately. " +
+    "Assess the salary structure below (component names and amounts) and respond in EXACTLY this structure (plain text, no markdown headers):\n\n" +
+    "SCORE: <a single integer 0-100 compliance score>\n" +
+    "SUMMARY: <one or two sentence overall assessment, including the excluded-components % of total if you can compute it>\n" +
+    "STRENGTHS:\n- <bullet>\n" +
+    "GAPS & RISKS:\n- <bullet>\n" +
+    "SUGGESTIONS FOR IMPROVEMENT:\n- <specific, actionable bullet, e.g. how to restructure Basic/DA to reach the 50% threshold>\n- <bullet>\n\n" +
+    "Be concise and practical, and show any percentage/rupee figures you compute. If the text doesn't look like a salary structure, say so under SUMMARY and give a low score. " +
+    "End with one line reminding the reader this is a training/self-assessment aid, not legal advice.\n\n=== SALARY STRUCTURE TO REVIEW ===\n";
+
+  async function runReview(opts){
+    var fileInput = document.getElementById(opts.fileId);
+    var textArea = document.getElementById(opts.textId);
+    var out = document.getElementById(opts.outId);
+    var btn = document.getElementById(opts.btnId);
+
+    var text = textArea.value.trim();
+    if(!text && fileInput.files && fileInput.files[0]){
+      try{
+        text = (await readTextFile(fileInput.files[0])).trim();
+        textArea.value = text;
+      }catch(e){ /* fall through to the empty-text message below */ }
+    }
+    if(!text){
+      out.innerHTML = '<div class="note-box">'+opts.emptyMsg+'</div>';
+      return;
+    }
+
+    out.innerHTML = '<div class="note-box">Analyzing against the four labour codes…</div>';
+    btn.disabled = true;
+    try{
+      var fn = await ensureSample();
+      if(!fn) throw new Error("no sampling function");
+      var prompt = opts.promptPrefix + text.slice(0, 15000);
+      var result = await fn(
+        [{role:"user", content:KNOWLEDGE_BASE}, {role:"user", content:prompt}],
+        {modelTier:"default", cache:false}
+      );
+      renderReview(out, result.text || "", opts.heading);
+    }catch(e){
+      var copy = errorCopy(e && e.code) || "Something went wrong reaching the agent. Please try again.";
+      out.innerHTML = '<div class="note-box">Could not complete the review — '+escapeHtml(copy)+'</div>';
+    }finally{
+      btn.disabled = false;
+    }
+  }
+
+  document.getElementById("policyReviewBtn").addEventListener("click", function(){
+    runReview({
+      fileId:"policyFile", textId:"policyText", outId:"policyReviewResults", btnId:"policyReviewBtn",
+      promptPrefix:POLICY_REVIEW_PROMPT, heading:"Policy review",
+      emptyMsg:"Upload a .txt file or paste your policy text first."
+    });
+  });
+  document.getElementById("salaryReviewBtn").addEventListener("click", function(){
+    runReview({
+      fileId:"salaryStructFile", textId:"salaryStructText", outId:"salaryReviewResults", btnId:"salaryReviewBtn",
+      promptPrefix:SALARY_REVIEW_PROMPT, heading:"Salary structure review",
+      emptyMsg:"Upload a file or paste your salary structure first."
+    });
+  });
+  document.getElementById("policyFile").addEventListener("change", function(){
+    var f = this.files && this.files[0];
+    if(!f) return;
+    readTextFile(f).then(function(t){ document.getElementById("policyText").value = t; }).catch(function(){});
+  });
+  document.getElementById("salaryStructFile").addEventListener("change", function(){
+    var f = this.files && this.files[0];
+    if(!f) return;
+    readTextFile(f).then(function(t){ document.getElementById("salaryStructText").value = t; }).catch(function(){});
+  });
 
   /* =========================================================
      ADD TO HOME SCREEN (PWA install)
