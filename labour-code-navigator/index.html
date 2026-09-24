@@ -1550,15 +1550,12 @@
   var POLICY_REVIEW_PROMPT =
     "You are reviewing an HR policy document for alignment with India's four new labour codes (Code on Wages, Industrial Relations Code, OSH & Working Conditions Code, Code on Social Security), using ONLY the reference notes provided separately. " +
     "Assess the policy text below and respond in EXACTLY this structure (plain text, no markdown headers):\n\n" +
-    "SCORE: <a single integer 0-100 overall health score>\n" +
-    "SUMMARY: <two to three sentence overall assessment>\n" +
-    "STRENGTHS:\n- <bullet>\n- <bullet>\n- <bullet>\n" +
-    "GAPS & RISKS:\n- <bullet, naming the relevant code/provision where relevant>\n- <bullet>\n- <bullet>\n" +
-    "SUGGESTIONS FOR IMPROVEMENT:\n- <specific, actionable bullet>\n- <specific, actionable bullet>\n- <specific, actionable bullet>\n\n" +
-    "HOW TO STREAMLINE THIS POLICY UNDER THE FOUR LABOUR CODES:\n<Write a clear, elaborative, well-structured guidance passage of AT LEAST 100 WORDS (do not fall short of 100 words) that walks the reader through concretely streamlining this specific policy. " +
-    "Organize it around the four codes — explicitly name which parts of the policy map to the Code on Wages, Industrial Relations Code, OSH & Working Conditions Code, and Code on Social Security, and for each relevant code explain in plain, practical language what to add, remove, reword, or restructure, referencing specific provisions/sections from the reference notes where possible. " +
-    "Cover sequencing (what to fix first vs. later), any definitions or clauses that need updating to match the new codes' terminology, and one or two quick wins the policy owner can implement immediately. Write in full sentences and short paragraphs, not just bullets — this section should read as genuine expert guidance, not a summary.>\n\n" +
-    "Be thorough and elaborative throughout, not terse — this is meant to give the reader real clarity and a concrete action path, not just a checklist. If the text provided doesn't look like an HR policy, say so under SUMMARY and give a low score (but still complete every section as best you can). " +
+    "SCORE: <a single integer 0-100 overall health score, reflecting how well the policy aligns with the four labour codes>\n" +
+    "SUMMARY: <two to three sentence overall assessment explaining what the score reflects>\n" +
+    "MAJOR GAPS & AREAS FOR IMPROVEMENT:\n- <bullet, naming the specific code/provision the policy falls short of>\n- <bullet>\n- <bullet>\n- <bullet>\n" +
+    "SUGGESTIONS & RECOMMENDATIONS:\n- <specific, actionable bullet the policy owner can implement>\n- <specific, actionable bullet>\n- <specific, actionable bullet>\n- <specific, actionable bullet>\n\n" +
+    "The SUMMARY, MAJOR GAPS & AREAS FOR IMPROVEMENT and SUGGESTIONS & RECOMMENDATIONS sections together must total AT LEAST 100 WORDS (do not fall short of 100 words) — be specific and substantive, not padded, and name the relevant code/provision wherever you can. " +
+    "If the text provided doesn't look like an HR policy, say so under SUMMARY and give a low score (but still complete every section as best you can). " +
     "End with one line reminding the reader this is a training/self-assessment aid, not legal advice.\n\n=== POLICY TEXT TO REVIEW ===\n";
 
   var SALARY_REVIEW_PROMPT =
