@@ -293,6 +293,29 @@
   .chat-input-row textarea{resize:none; height:44px; padding:11px 13px;}
   .disclaimer{font-size:11px; color:var(--ink-faint); text-align:center; padding:8px 16px 0;}
 
+  /* ---------- AI response formatting (chat replies + policy/salary reviews) ----------
+     Renders the agent's Markdown (bold, headings, bullet/numbered lists) properly
+     instead of showing raw **/#/- characters, with a clean, professional, high-contrast
+     charcoal text style and consistent spacing between elements. ---------- */
+  .md-content{color:var(--ink); font-size:13.5px; line-height:1.7; letter-spacing:.005em;}
+  .md-content > *:first-child{margin-top:0;}
+  .md-content > *:last-child{margin-bottom:0;}
+  .md-content p{margin:0 0 11px;}
+  .md-content h4,.md-content h5,.md-content h6{
+    font-family:'Public Sans',sans-serif; font-weight:700; color:var(--ink);
+    line-height:1.35; letter-spacing:.01em; margin:18px 0 7px;
+  }
+  .md-content h4{font-size:15.5px;}
+  .md-content h5{font-size:13.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--accent-ink);}
+  .md-content h6{font-size:13px; color:var(--ink-soft);}
+  .md-content ul,.md-content ol{margin:0 0 12px; padding-left:21px; display:flex; flex-direction:column; gap:7px;}
+  .md-content li{line-height:1.65;}
+  .md-content li::marker{color:var(--accent);}
+  .md-content strong{font-weight:700; color:var(--ink);}
+  .md-content em{font-style:italic;}
+  .msg.bot.md-content{font-size:13.8px; line-height:1.6;}
+  .msg.bot.md-content h5{color:var(--accent-ink);}
+
   /* ---------- footer ---------- */
   footer{border-top:1px solid var(--border); padding:30px 0 44px; margin-top:20px;}
   .foot-grid{display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-faint);}
@@ -490,10 +513,10 @@
         <div class="calc-grid">
           <div class="calc-panel card">
             <h3>Your policy text</h3>
-            <div class="hint">Upload a .txt file, or paste the policy text directly. (For PDF/Word files, open the file and paste the text here — this in-browser tool can't parse those formats.)</div>
+            <div class="hint">Upload a .txt, .pdf or .docx file, or paste the policy text directly. (Scanned/image PDFs and old .doc files aren't supported — paste the text instead.)</div>
             <div class="field">
-              <label for="policyFile">Upload policy (.txt)</label>
-              <input type="file" id="policyFile" accept=".txt,text/plain">
+              <label for="policyFile">Upload policy (.txt, .pdf, .docx)</label>
+              <input type="file" id="policyFile" accept=".txt,.pdf,.docx,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
             </div>
             <div class="field">
               <label for="policyText">Or paste policy text</label>
@@ -512,10 +535,10 @@
         <div class="calc-grid">
           <div class="calc-panel card">
             <h3>Your salary structure</h3>
-            <div class="hint">Upload a .txt or .csv file, or paste the structure directly — component names and amounts (e.g. "Basic 20000, HRA 10000, Conveyance 1600…").</div>
+            <div class="hint">Upload a .txt, .csv, .pdf or .docx file, or paste the structure directly — component names and amounts (e.g. "Basic 20000, HRA 10000, Conveyance 1600…").</div>
             <div class="field">
-              <label for="salaryStructFile">Upload salary structure (.txt, .csv)</label>
-              <input type="file" id="salaryStructFile" accept=".txt,.csv,text/plain,text/csv">
+              <label for="salaryStructFile">Upload salary structure (.txt, .csv, .pdf, .docx)</label>
+              <input type="file" id="salaryStructFile" accept=".txt,.csv,.pdf,.docx,text/plain,text/csv,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
             </div>
             <div class="field">
               <label for="salaryStructText">Or paste salary structure</label>
@@ -540,12 +563,16 @@
       <div class="chat-shell">
         <div class="chat-side card">
           <h4>Try asking</h4>
-          <button class="starter">What exactly is the 50% wage rule and how does it change my CTC?</button>
-          <button class="starter">Do we need Standing Orders at 250 employees?</button>
-          <button class="starter">How does gratuity work for a fixed-term hire?</button>
-          <button class="starter">What changed in maternity benefit under the new code?</button>
-          <button class="starter">Are we an "aggregator" liable for the gig-worker social security contribution?</button>
-          <button class="starter">What's the overtime pay rate and consent rule now?</button>
+          <button class="starter">What is the definition of wages under the Labour Codes?</button>
+          <button class="starter">Which salary components are included in wages?</button>
+          <button class="starter">Which salary components are excluded from wages?</button>
+          <button class="starter">What is the 50% wage rule under the Labour Codes?</button>
+          <button class="starter">How should Basic Pay be fixed as per the Labour Codes?</button>
+          <button class="starter">How can I calculate the wage component from my gross salary?</button>
+          <button class="starter">Who is eligible for ESI under the Labour Codes?</button>
+          <button class="starter">Who is eligible for PF under the latest Labour Code provisions?</button>
+          <button class="starter">How is PF calculated under the new Labour Codes?</button>
+          <button class="starter">How is gratuity calculated under the new wage definition?</button>
           <div class="note-box" style="margin-top:16px;">Answers use the viewer's own Claude account and are for training purposes — always verify against the notified central/state rules before acting.</div>
         </div>
         <div class="chat-main card">
@@ -1121,8 +1148,13 @@
 
   function addMsg(role, text){
     var el = document.createElement("div");
-    el.className = "msg " + role;
-    el.textContent = text;
+    var isBot = role.split(" ").indexOf("bot") !== -1;
+    el.className = "msg " + role + (isBot ? " md-content" : "");
+    if(isBot){
+      el.innerHTML = renderMarkdownLite(text);
+    } else {
+      el.textContent = text;
+    }
     chatLog.appendChild(el);
     chatLog.scrollTop = chatLog.scrollHeight;
     return el;
@@ -1222,12 +1254,12 @@
         signal: currentAbort.signal,
         onText: function(update){
           thinkingEl.classList.remove("thinking");
-          thinkingEl.textContent = update.text;
+          thinkingEl.innerHTML = renderMarkdownLite(update.text);
           chatLog.scrollTop = chatLog.scrollHeight;
         }
       });
       thinkingEl.classList.remove("thinking");
-      thinkingEl.textContent = result.text;
+      thinkingEl.innerHTML = renderMarkdownLite(result.text);
       chatTurns.push({role:"assistant", content:result.text});
       if(result.truncated){
         chatStatus.textContent = "Answer was cut short — ask a more specific follow-up.";
@@ -1242,7 +1274,7 @@
         var kept = e && e.text ? e.text : "";
         if(kept){
           thinkingEl.classList.remove("thinking");
-          thinkingEl.textContent = kept;
+          thinkingEl.innerHTML = renderMarkdownLite(kept);
         } else {
           thinkingEl.remove();
         }
@@ -1284,6 +1316,77 @@
     });
   }
 
+  /* ---- Lightweight Markdown renderer for AI-generated text (chat replies and
+     policy/salary review results) — turns **bold**, #/## headings, "- "/"* " bullet
+     lists, "1. " numbered lists and blank-line paragraph breaks into real HTML,
+     instead of the raw Markdown characters showing up as plain text. Escapes all
+     text first, so this never introduces unsafe HTML from a model response. ---- */
+  function mdInline(s){
+    var out = escapeHtml(s);
+    out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    out = out.replace(/(^|[^*])\*([^*\s][^*]*?)\*(?!\*)/g, '$1<em>$2</em>');
+    out = out.replace(/(^|[^_])_([^_\s][^_]*?)_(?!_)/g, '$1<em>$2</em>');
+    return out;
+  }
+  function isBulletLine(l){ return /^\s*[-*•]\s+\S/.test(l); }
+  function isNumberedLine(l){ return /^\s*\d+[.)]\s+\S/.test(l); }
+  function isHashHeading(l){ return /^\s{0,3}#{1,6}\s+\S/.test(l); }
+  function isLabelHeading(l){
+    var t = l.trim();
+    if(!t || t.length > 70 || !/:$/.test(t) || /[.!?]/.test(t)) return false;
+    return /^[A-Z][A-Za-z0-9 '&/-]*:$/.test(t) && t.replace(/[^A-Za-z]/g,"").length >= 3;
+  }
+  function renderMarkdownLite(raw){
+    var text = String(raw == null ? "" : raw).replace(/\r\n/g, "\n").trim();
+    if(!text) return "";
+    var lines = text.split("\n");
+    var html = "";
+    var i = 0;
+    while(i < lines.length){
+      var line = lines[i];
+      if(line.trim() === ""){ i++; continue; }
+
+      if(isHashHeading(line)){
+        var hm = line.match(/^\s{0,3}(#{1,6})\s+(.*)$/);
+        var level = Math.min(hm[1].length + 3, 6);
+        html += '<h'+level+'>'+mdInline(hm[2].trim())+'</h'+level+'>';
+        i++;
+        continue;
+      }
+      if(isLabelHeading(line)){
+        html += '<h5>'+mdInline(line.trim())+'</h5>';
+        i++;
+        continue;
+      }
+      if(isBulletLine(line)){
+        var uItems = [];
+        while(i < lines.length && isBulletLine(lines[i])){
+          uItems.push(lines[i].replace(/^\s*[-*•]\s+/, ""));
+          i++;
+        }
+        html += '<ul>'+uItems.map(function(it){ return '<li>'+mdInline(it)+'</li>'; }).join("")+'</ul>';
+        continue;
+      }
+      if(isNumberedLine(line)){
+        var oItems = [];
+        while(i < lines.length && isNumberedLine(lines[i])){
+          oItems.push(lines[i].replace(/^\s*\d+[.)]\s+/, ""));
+          i++;
+        }
+        html += '<ol>'+oItems.map(function(it){ return '<li>'+mdInline(it)+'</li>'; }).join("")+'</ol>';
+        continue;
+      }
+
+      var para = [];
+      while(i < lines.length && lines[i].trim() !== "" && !isBulletLine(lines[i]) && !isNumberedLine(lines[i]) && !isHashHeading(lines[i]) && !isLabelHeading(lines[i])){
+        para.push(lines[i]);
+        i++;
+      }
+      html += '<p>'+para.map(mdInline).join("<br>")+'</p>';
+    }
+    return html;
+  }
+
   function readTextFile(file){
     return new Promise(function(resolve, reject){
       var reader = new FileReader();
@@ -1291,6 +1394,130 @@
       reader.onerror = function(){ reject(new Error("Could not read file")); };
       reader.readAsText(file);
     });
+  }
+
+  /* ---- .docx text extraction — pure vanilla JS, no external library.
+     A .docx is a zip archive; we walk its central directory to find
+     word/document.xml, inflate it with the browser's native
+     DecompressionStream, and strip the XML tags down to plain text. ---- */
+  async function readDocxText(file){
+    var buf = await file.arrayBuffer();
+    var bytes = new Uint8Array(buf);
+    var dv = new DataView(buf);
+
+    var eocdSig = 0x06054b50;
+    var eocdOffset = -1;
+    var scanStart = Math.max(0, bytes.length - 65557); // max zip comment length 65535 + 22-byte record
+    for(var i = bytes.length - 22; i >= scanStart; i--){
+      if(dv.getUint32(i, true) === eocdSig){ eocdOffset = i; break; }
+    }
+    if(eocdOffset < 0) throw new Error("This doesn't look like a valid .docx file — please paste the text instead.");
+
+    var cdEntries = dv.getUint16(eocdOffset + 10, true);
+    var cdOffset = dv.getUint32(eocdOffset + 16, true);
+
+    var pos = cdOffset, target = null;
+    for(var e = 0; e < cdEntries; e++){
+      if(dv.getUint32(pos, true) !== 0x02014b50) break;
+      var compMethod = dv.getUint16(pos + 10, true);
+      var compSize = dv.getUint32(pos + 20, true);
+      var nameLen = dv.getUint16(pos + 28, true);
+      var extraLen = dv.getUint16(pos + 30, true);
+      var commentLen = dv.getUint16(pos + 32, true);
+      var localOffset = dv.getUint32(pos + 42, true);
+      var name = "";
+      for(var k = 0; k < nameLen; k++){ name += String.fromCharCode(bytes[pos + 46 + k]); }
+      if(name === "word/document.xml"){
+        target = { compMethod:compMethod, compSize:compSize, localOffset:localOffset };
+      }
+      pos += 46 + nameLen + extraLen + commentLen;
+    }
+    if(!target) throw new Error("Could not find document content in this .docx file — please paste the text instead.");
+
+    var lpos = target.localOffset;
+    if(dv.getUint32(lpos, true) !== 0x04034b50) throw new Error("This .docx file looks corrupted — please paste the text instead.");
+    var lNameLen = dv.getUint16(lpos + 26, true);
+    var lExtraLen = dv.getUint16(lpos + 28, true);
+    var dataStart = lpos + 30 + lNameLen + lExtraLen;
+    var compBytes = bytes.subarray(dataStart, dataStart + target.compSize);
+
+    var xmlBytes;
+    if(target.compMethod === 0){
+      xmlBytes = compBytes;
+    } else if(target.compMethod === 8){
+      if(typeof DecompressionStream === "undefined"){
+        throw new Error("This browser can't open .docx files — please paste the text instead, or try a recent Chrome/Edge/Safari/Firefox.");
+      }
+      var stream = new Blob([compBytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+      xmlBytes = new Uint8Array(await new Response(stream).arrayBuffer());
+    } else {
+      throw new Error("Unsupported compression in this .docx file — please paste the text instead.");
+    }
+
+    var xml = new TextDecoder("utf-8").decode(xmlBytes);
+    var text = xml
+      .replace(/<\/w:p>/g, "\n")
+      .replace(/<w:tab\/>/g, "\t")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+      .replace(/[ \t]+\n/g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+    if(!text) throw new Error("No readable text found in this .docx file — please paste the text instead.");
+    return text;
+  }
+
+  /* ---- PDF text extraction — lazy-loads pdf.js from a CDN on first use.
+     If the library can't load (e.g. a sandboxed preview with no external
+     network access), this fails gracefully with a message asking the
+     user to paste the text instead; nothing else in the app depends on it. ---- */
+  var _pdfjsLoadPromise = null;
+  function loadPdfJs(){
+    if(_pdfjsLoadPromise) return _pdfjsLoadPromise;
+    _pdfjsLoadPromise = new Promise(function(resolve, reject){
+      if(window.pdfjsLib){ resolve(window.pdfjsLib); return; }
+      var s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js";
+      s.onload = function(){
+        try{
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js";
+          resolve(window.pdfjsLib);
+        }catch(e){ reject(e); }
+      };
+      s.onerror = function(){ reject(new Error("load-failed")); };
+      document.head.appendChild(s);
+      setTimeout(function(){ reject(new Error("timed-out")); }, 12000);
+    });
+    return _pdfjsLoadPromise;
+  }
+
+  async function readPdfText(file){
+    var pdfjsLib;
+    try{
+      pdfjsLib = await loadPdfJs();
+    }catch(e){
+      throw new Error("Could not load the PDF reader (this preview may not allow outside network access) — please open the PDF and paste the text instead.");
+    }
+    var buf = await file.arrayBuffer();
+    var pdf = await pdfjsLib.getDocument({ data:buf }).promise;
+    var pageTexts = [];
+    var maxPages = Math.min(pdf.numPages, 40);
+    for(var p = 1; p <= maxPages; p++){
+      var page = await pdf.getPage(p);
+      var content = await page.getTextContent();
+      pageTexts.push(content.items.map(function(it){ return it.str; }).join(" "));
+    }
+    var text = pageTexts.join("\n\n").trim();
+    if(!text) throw new Error("No selectable text was found in this PDF — it may be a scanned image. Please paste the text instead.");
+    return text;
+  }
+
+  function extractTextFromFile(file){
+    var name = (file.name || "").toLowerCase();
+    if(name.slice(-5) === ".docx") return readDocxText(file);
+    if(name.slice(-4) === ".pdf") return readPdfText(file);
+    if(name.slice(-4) === ".doc") return Promise.reject(new Error("Old .doc files can't be read in-browser — please save as .docx or paste the text instead."));
+    return readTextFile(file);
   }
 
   function scoreStatus(score){
@@ -1316,7 +1543,7 @@
     out.innerHTML =
       '<h3>'+heading+'</h3>' +
       heroHtml +
-      '<div style="white-space:pre-wrap; font-size:13.3px; line-height:1.7; margin-top:'+(heroHtml ? "4px" : "0")+';">'+escapeHtml(body)+'</div>' +
+      '<div class="md-content" style="margin-top:'+(heroHtml ? "4px" : "0")+';">'+renderMarkdownLite(body)+'</div>' +
       '<div class="note-box" style="margin-top:16px;">AI-generated training guidance, not legal advice — always confirm against the latest central/state notifications.</div>';
   }
 
@@ -1324,11 +1551,14 @@
     "You are reviewing an HR policy document for alignment with India's four new labour codes (Code on Wages, Industrial Relations Code, OSH & Working Conditions Code, Code on Social Security), using ONLY the reference notes provided separately. " +
     "Assess the policy text below and respond in EXACTLY this structure (plain text, no markdown headers):\n\n" +
     "SCORE: <a single integer 0-100 overall health score>\n" +
-    "SUMMARY: <one or two sentence overall assessment>\n" +
-    "STRENGTHS:\n- <bullet>\n- <bullet>\n" +
-    "GAPS & RISKS:\n- <bullet, naming the relevant code/provision where relevant>\n- <bullet>\n" +
-    "SUGGESTIONS FOR IMPROVEMENT:\n- <specific, actionable bullet>\n- <specific, actionable bullet>\n\n" +
-    "Be concise and practical. If the text provided doesn't look like an HR policy, say so under SUMMARY and give a low score. " +
+    "SUMMARY: <two to three sentence overall assessment>\n" +
+    "STRENGTHS:\n- <bullet>\n- <bullet>\n- <bullet>\n" +
+    "GAPS & RISKS:\n- <bullet, naming the relevant code/provision where relevant>\n- <bullet>\n- <bullet>\n" +
+    "SUGGESTIONS FOR IMPROVEMENT:\n- <specific, actionable bullet>\n- <specific, actionable bullet>\n- <specific, actionable bullet>\n\n" +
+    "HOW TO STREAMLINE THIS POLICY UNDER THE FOUR LABOUR CODES:\n<Write a clear, elaborative, well-structured guidance passage of AT LEAST 100 WORDS (do not fall short of 100 words) that walks the reader through concretely streamlining this specific policy. " +
+    "Organize it around the four codes — explicitly name which parts of the policy map to the Code on Wages, Industrial Relations Code, OSH & Working Conditions Code, and Code on Social Security, and for each relevant code explain in plain, practical language what to add, remove, reword, or restructure, referencing specific provisions/sections from the reference notes where possible. " +
+    "Cover sequencing (what to fix first vs. later), any definitions or clauses that need updating to match the new codes' terminology, and one or two quick wins the policy owner can implement immediately. Write in full sentences and short paragraphs, not just bullets — this section should read as genuine expert guidance, not a summary.>\n\n" +
+    "Be thorough and elaborative throughout, not terse — this is meant to give the reader real clarity and a concrete action path, not just a checklist. If the text provided doesn't look like an HR policy, say so under SUMMARY and give a low score (but still complete every section as best you can). " +
     "End with one line reminding the reader this is a training/self-assessment aid, not legal advice.\n\n=== POLICY TEXT TO REVIEW ===\n";
 
   var SALARY_REVIEW_PROMPT =
@@ -1350,10 +1580,15 @@
 
     var text = textArea.value.trim();
     if(!text && fileInput.files && fileInput.files[0]){
+      var f0 = fileInput.files[0];
+      out.innerHTML = '<div class="note-box">Reading '+escapeHtml(f0.name)+'…</div>';
       try{
-        text = (await readTextFile(fileInput.files[0])).trim();
+        text = (await extractTextFromFile(f0)).trim();
         textArea.value = text;
-      }catch(e){ /* fall through to the empty-text message below */ }
+      }catch(e){
+        out.innerHTML = '<div class="note-box">'+escapeHtml((e && e.message) || "Could not read that file — please paste the text instead.")+'</div>';
+        return;
+      }
     }
     if(!text){
       out.innerHTML = '<div class="note-box">'+opts.emptyMsg+'</div>';
@@ -1383,25 +1618,39 @@
     runReview({
       fileId:"policyFile", textId:"policyText", outId:"policyReviewResults", btnId:"policyReviewBtn",
       promptPrefix:POLICY_REVIEW_PROMPT, heading:"Policy review",
-      emptyMsg:"Upload a .txt file or paste your policy text first."
+      emptyMsg:"Upload a .txt, .pdf or .docx file, or paste your policy text first."
     });
   });
   document.getElementById("salaryReviewBtn").addEventListener("click", function(){
     runReview({
       fileId:"salaryStructFile", textId:"salaryStructText", outId:"salaryReviewResults", btnId:"salaryReviewBtn",
       promptPrefix:SALARY_REVIEW_PROMPT, heading:"Salary structure review",
-      emptyMsg:"Upload a file or paste your salary structure first."
+      emptyMsg:"Upload a .txt, .csv, .pdf or .docx file, or paste your salary structure first."
     });
   });
   document.getElementById("policyFile").addEventListener("change", function(){
     var f = this.files && this.files[0];
     if(!f) return;
-    readTextFile(f).then(function(t){ document.getElementById("policyText").value = t; }).catch(function(){});
+    var out = document.getElementById("policyReviewResults");
+    out.innerHTML = '<div class="note-box">Reading '+escapeHtml(f.name)+'…</div>';
+    extractTextFromFile(f).then(function(t){
+      document.getElementById("policyText").value = t;
+      out.innerHTML = '<div class="note-box">Loaded '+escapeHtml(f.name)+' — click "Review policy" to analyze.</div>';
+    }).catch(function(e){
+      out.innerHTML = '<div class="note-box">'+escapeHtml((e && e.message) || "Could not read that file — please paste the text instead.")+'</div>';
+    });
   });
   document.getElementById("salaryStructFile").addEventListener("change", function(){
     var f = this.files && this.files[0];
     if(!f) return;
-    readTextFile(f).then(function(t){ document.getElementById("salaryStructText").value = t; }).catch(function(){});
+    var out = document.getElementById("salaryReviewResults");
+    out.innerHTML = '<div class="note-box">Reading '+escapeHtml(f.name)+'…</div>';
+    extractTextFromFile(f).then(function(t){
+      document.getElementById("salaryStructText").value = t;
+      out.innerHTML = '<div class="note-box">Loaded '+escapeHtml(f.name)+' — click "Review salary structure" to analyze.</div>';
+    }).catch(function(e){
+      out.innerHTML = '<div class="note-box">'+escapeHtml((e && e.message) || "Could not read that file — please paste the text instead.")+'</div>';
+    });
   });
 
   /* =========================================================
